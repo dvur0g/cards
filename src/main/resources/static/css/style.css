@@ -93,13 +93,8 @@ body {
 .div-table-row {
     background-color: #eeffff;
     display: table-row;
-    clear: both;
-    border-spacing: 15px;
-    text-align: justify;
-    -ms-text-justify: distribute-all-lines;
-    text-justify: distribute-all-lines;
-    /* just for demo */
-    min-width: 612px;
+    /*clear: both;*/
+    /*border-spacing: 15px;*/
 }
 
 .div-table-col-left {
@@ -113,6 +108,32 @@ body {
 .div-table-col-right {
     float: right; /* fix for  buggy browsers */
     width: 69%;
+    height: 100%;
+    background-color: rgba(128, 128, 128, 0.16);
+    outline: solid;
+}
+
+
+.div-cards-table {
+    display: table;
+    width: 100%;
+    height: 100%;
+    background-color: #eee;
+    /*border: 1px solid #666666;*/
+    margin: auto;
+    /*border-spacing: 15px; !* cellspacing:poor IE support for  this *!*/
+}
+
+.div-cards-table-row {
+    background-color: #eeffff;
+    display: table-row;
+    /*clear: both;*/
+    /*border-spacing: 15px;*/
+}
+
+.div-cards-table-col {
+    float: left; /* fix for  buggy browsers */
+    width: 20%;
     height: 100%;
     background-color: rgba(128, 128, 128, 0.16);
     outline: solid;
