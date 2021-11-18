@@ -5,7 +5,7 @@ import ru.ruiners.cards.exception.InvalidParamException;
 import ru.ruiners.cards.exception.NotFoundException;
 import ru.ruiners.cards.model.Game;
 import ru.ruiners.cards.model.GamePlay;
-import ru.ruiners.cards.model.Player;
+import ru.ruiners.cards.model.PlayerRequest;
 import ru.ruiners.cards.model.TicToe;
 import ru.ruiners.cards.storage.GameStorage;
 import lombok.AllArgsConstructor;
@@ -19,7 +19,7 @@ import static ru.ruiners.cards.model.GameStatus.*;
 @AllArgsConstructor
 public class GameService {
 
-    public Game createGame(Player player) {
+    public Game createGame(PlayerRequest player) {
         Game game = new Game();
         game.setBoard(new int[3][3]);
         game.setGameId(UUID.randomUUID().toString());
@@ -29,7 +29,7 @@ public class GameService {
         return game;
     }
 
-    public Game connectToGame(Player player2, String gameId) throws InvalidParamException, InvalidGameException {
+    public Game connectToGame(PlayerRequest player2, String gameId) throws InvalidParamException, InvalidGameException {
         if (!GameStorage.getInstance().getGames().containsKey(gameId)) {
             throw new InvalidParamException("Game with provided id doesn't exist");
         }
@@ -45,7 +45,7 @@ public class GameService {
         return game;
     }
 
-    public Game connectToRandomGame(Player player2) throws NotFoundException {
+    public Game connectToRandomGame(PlayerRequest player2) throws NotFoundException {
         Game game = GameStorage.getInstance().getGames().values().stream()
                 .filter(it -> it.getStatus().equals(NEW))
                 .findFirst().orElseThrow(() -> new NotFoundException("Game not found"));

@@ -3,7 +3,7 @@ package ru.ruiners.cards.model;
 import lombok.Data;
 
 @Data
-public class Player {
+public class PlayerRequest {
 
-    private String login;
+    private String username;
 }

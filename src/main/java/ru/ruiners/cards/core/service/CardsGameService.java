@@ -12,6 +12,7 @@ import ru.ruiners.cards.core.model.Question;
 import ru.ruiners.cards.core.model.enums.GameState;
 import ru.ruiners.cards.core.repository.CardRepository;
 import ru.ruiners.cards.core.repository.GameRepository;
+import ru.ruiners.cards.core.repository.PlayerRepository;
 import ru.ruiners.cards.core.repository.QuestionRepository;
 
 import javax.transaction.Transactional;
@@ -30,6 +31,7 @@ public class CardsGameService {
     private final GameRepository repository;
     private final CardRepository cardRepository;
     private final QuestionRepository questionRepository;
+    private final PlayerRepository playerRepository;
 
     private final Random random = new Random();
 
@@ -37,14 +39,23 @@ public class CardsGameService {
         if (minPlayersAmount > MAX_PLAYERS_AMOUNT || minPlayersAmount < MIN_PLAYERS_AMOUNT) {
             throw new BusinessException("Invalid players amount");
         }
-
-        var game = new Game();
+        Game game = new Game();
         game.setState(GameState.CREATED);
         game.setPlayers(List.of(player));
         game.setMinPlayersAmount(minPlayersAmount);
 
+        saveNewPlayer(player, game.getId());
         game = repository.save(game);
+
         return game;
+    }
+
+    public Game connectToRandomGame(Player player) {
+        List<Game> gamesToConnect = getGamesToConnect();
+        if (gamesToConnect.size() == 0) {
+            throw new BusinessException("No games to connect to");
+        }
+        return connectToGame(player, gamesToConnect.get(random.nextInt(gamesToConnect.size())).getId());
     }
 
     @Transactional
@@ -59,6 +70,7 @@ public class CardsGameService {
         }
 
         game.getPlayers().add(player);
+        saveNewPlayer(player, game.getId());
 
         if (game.getPlayers().size() >= game.getMinPlayersAmount()) {
             startGame(game);
@@ -74,6 +86,13 @@ public class CardsGameService {
         game.setCurrentPlayer(game.getPlayers().get(random.nextInt(game.getPlayers().size())));
 
         game.setState(GameState.IN_PROGRESS);
+    }
+
+    private void saveNewPlayer(Player player, Long gameId) {
+        player.setGameId(gameId);
+        player.setScore(0);
+        player.setCards(getRandomCards());
+        playerRepository.save(player);
     }
 
     private List<Card> getRandomCards() {

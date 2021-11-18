@@ -3,6 +3,10 @@ let stompClient;
 let gameId;
 let playerType;
 
+function showMenu() {
+    document.getElementById("menu").style.visibility = "visible";
+}
+
 function connectToSocket(gameId) {
 
     console.log("connecting to the game");
@@ -18,10 +22,10 @@ function connectToSocket(gameId) {
     })
 }
 
-function create_game() {
-    let login = document.getElementById("login").value;
-    if (login == null || login === '') {
-        alert("Please enter login");
+function createGame() {
+    let username = document.getElementById("username").value;
+    if (username == null || username === '') {
+        alert("Please enter username");
     } else {
         $.ajax({
             url: url + "/game/start",
@@ -29,7 +33,7 @@ function create_game() {
             dataType: "json",
             contentType: "application/json",
             data: JSON.stringify({
-                "login": login
+                "login": username
             }),
             success: function (data) {
                 gameId = data.gameId;
@@ -38,6 +42,7 @@ function create_game() {
                 connectToSocket(gameId);
                 alert("Your created a game. Game id is: " + data.gameId);
                 gameOn = true;
+                document.getElementById("menu").style.visibility = "hidden";
             },
             error: function (error) {
                 console.log(error);
