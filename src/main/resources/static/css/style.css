@@ -1,8 +1,3 @@
-body {
-    background: #212121;
-    color: #666;
-}
-
 h1 {
     text-align: center;
     color: #fff;
@@ -65,4 +60,60 @@ footer {
     display: block;
     text-align: center;
     padding-top: 20px;
+}
+
+
+
+
+html {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+}
+
+body {
+    background: #dedede;
+    color: #666;
+    height: 100%;
+    width: 70%;
+    margin: auto;
+
+}
+
+.div-table {
+    display: table;
+    width: 100%;
+    height: 100%;
+    background-color: #eee;
+    /*border: 1px solid #666666;*/
+    margin: auto;
+    border-spacing: 15px; /* cellspacing:poor IE support for  this */
+}
+
+.div-table-row {
+    background-color: #eeffff;
+    display: table-row;
+    clear: both;
+    border-spacing: 15px;
+    text-align: justify;
+    -ms-text-justify: distribute-all-lines;
+    text-justify: distribute-all-lines;
+    /* just for demo */
+    min-width: 612px;
+}
+
+.div-table-col-left {
+    float: left; /* fix for  buggy browsers */
+    width: 30%;
+    height: 100%;
+    background-color: rgba(128, 128, 128, 0.16);
+    outline: solid;
+}
+
+.div-table-col-right {
+    float: right; /* fix for  buggy browsers */
+    width: 69%;
+    height: 100%;
+    background-color: rgba(128, 128, 128, 0.16);
+    outline: solid;
 }
