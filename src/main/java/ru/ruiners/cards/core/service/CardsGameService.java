@@ -33,6 +33,7 @@ public class CardsGameService {
 
     private final Random random = new Random();
 
+    @Transactional
     public Game createGame(Player player, Integer minPlayersAmount) {
         if (minPlayersAmount > MAX_PLAYERS_AMOUNT || minPlayersAmount < MIN_PLAYERS_AMOUNT) {
             throw new BusinessException("Invalid players amount");
@@ -41,13 +42,14 @@ public class CardsGameService {
         game.setState(GameState.CREATED);
         game.setMinPlayersAmount(minPlayersAmount);
 
-        saveNewPlayer(player, game.getId());
+        saveNewPlayer(player);
         game.setPlayers(List.of(player));
 
         game = repository.save(game);
         return game;
     }
 
+    @Transactional
     public Game connectToRandomGame(Player player) {
         List<Game> gamesToConnect = getGamesToConnect();
         if (gamesToConnect.size() == 0) {
@@ -67,7 +69,7 @@ public class CardsGameService {
             throw new BusinessException("Max players amount reached");
         }
 
-        saveNewPlayer(player, game.getId());
+        saveNewPlayer(player);
         game.getPlayers().add(player);
 
         if (game.getPlayers().size() >= game.getMinPlayersAmount()) {
@@ -77,6 +79,11 @@ public class CardsGameService {
         return game;
     }
 
+    @Transactional
+    public void disconnectFromGame(Player player) {
+        playerRepository.deleteByUsername(player.getUsername());
+    }
+
     private void startGame(Game game) {
         game.getPlayers().forEach(player -> player.setCards(getRandomCards()));
 
@@ -84,9 +91,10 @@ public class CardsGameService {
         game.setCurrentPlayer(game.getPlayers().get(random.nextInt(game.getPlayers().size())));
 
         game.setState(GameState.IN_PROGRESS);
+        repository.save(game);
     }
 
-    private void saveNewPlayer(Player player, Long gameId) {
+    private void saveNewPlayer(Player player) {
         if (playerRepository.existsByUsername(player.getUsername())) {
             throw new BusinessException("Player with this username playing at the moment");
         }

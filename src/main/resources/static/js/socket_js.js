@@ -1,6 +1,7 @@
 const url = 'http://localhost:8080';
 let stompClient;
 let gameId;
+let username;
 let playerType;
 
 function showMenu() {
@@ -20,13 +21,34 @@ function connectToSocket(gameId) {
             displayResponse(data);
         })
     })
+
+    document.getElementById("menu").style.visibility = "hidden";
+}
+
+function disconnectFromGame() {
+    console.log(username);
+
+    $.ajax({
+        url: url + "/game/disconnect",
+        type: 'POST',
+        dataType: "json",
+        contentType: "application/json",
+        data: JSON.stringify({
+            "username": username
+        })
+    });
+    stompClient.disconnect();
 }
 
 function createGame() {
-    let username = document.getElementById("username").value;
-    if (username == null || username === '') {
+    let usernameValue = document.getElementById("username").value;
+
+    if (usernameValue == null || usernameValue === '') {
         alert("Please enter username");
     } else {
+        username = usernameValue;
+        console.log(usernameValue + username);
+
         $.ajax({
             url: url + "/game/start",
             type: 'POST',
@@ -42,7 +64,6 @@ function createGame() {
                 connectToSocket(gameId);
                 alert("Your created a game. Game id is: " + data.gameId);
                 gameOn = true;
-                document.getElementById("menu").style.visibility = "hidden";
             },
             error: function (error) {
                 console.log(error);
@@ -53,10 +74,13 @@ function createGame() {
 
 
 function connectToRandom() {
-    let username = document.getElementById("username").value;
-    if (username == null || username === '') {
+    let usernameValue = document.getElementById("username").value;
+
+    if (usernameValue == null || usernameValue === '') {
         alert("Please enter username");
     } else {
+        username = usernameValue;
+
         $.ajax({
             url: url + "/game/connect/random",
             type: 'POST',
@@ -79,15 +103,18 @@ function connectToRandom() {
     }
 }
 
-function connectToSpecificGame() {
-    let username = document.getElementById("username").value;
-    if (username == null || username === '') {
+function connectToSpecificGame(gameId) {
+    let usernameValue = document.getElementById("username").value;
+
+    if (usernameValue == null || usernameValue === '') {
         alert("Please enter username");
     } else {
-        let gameId = document.getElementById("game_id").value;
         if (gameId == null || gameId === '') {
             alert("Please enter game id");
         }
+
+        username = usernameValue;
+
         $.ajax({
             url: url + "/game/connect",
             type: 'POST',
@@ -112,3 +139,38 @@ function connectToSpecificGame() {
         })
     }
 }
+
+function getAvailableGamesList() {
+    $.ajax({
+        url: url + "/game/list",
+        type: 'GET',
+        success: function (gamesList) {
+            showUL(gamesList)
+            gamesList.forEach(element => {
+                console.log(element.id + ", " + element.minPlayersAmount + ", " + element.state)
+
+            });
+            },
+        error: function (error) {
+            console.log(error);
+        }
+    })
+}
+
+function showUL(array) {
+    const list = document.createElement('ul');
+
+    for (let i = 0; i < array.length; i++) {
+        const item = document.createElement('li');
+
+        item.appendChild(document.createTextNode(array[i].id + ", " + array[i].state));
+        item.onclick = function() {
+            connectToSpecificGame(array[i].id)
+        };
+
+        list.appendChild(item);
+    }
+
+    document.getElementById('gamesList').appendChild(list);
+}
+

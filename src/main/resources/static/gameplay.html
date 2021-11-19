@@ -26,20 +26,16 @@
                 <div class="div-menu-table-col-right">
                     <div class="div-menu-table-row">
                         <div class="div-menu-table-col">
-                            Логин:
-                            <input id="username"></input>
+                            <label for="username">Логин:</label><input id="username">
                         </div>
                     </div>
                     <div class="div-menu-table-row">
                         <div class="div-menu-table-col" onclick="createGame()">Создать новую игру</div>
                     </div>
                     <div class="div-menu-table-row">
-                        <div class="div-menu-table-col">Подключиться к случайной игре</div>
+                        <div class="div-menu-table-col" onclick="getAvailableGamesList()">Обновить список игр</div>
                     </div>
-                    <div class="div-menu-table-row">
-                        <div class="div-menu-table-col">игра 1</div>
-                        <div class="div-menu-table-col">игра 2</div>
-                        <div class="div-menu-table-col">игра 3</div>
+                    <div id = "gamesList" class="div-menu-table-row">
                     </div>
                 </div>
             </div>
@@ -50,7 +46,7 @@
             <div class="div-table-row">
                 <div class="div-table-col-left">
                     Вопрос:
-                    <button onclick="showMenu()">Показать меню</button>
+                    <button onclick="disconnectFromGame(); showMenu()">Выйти из игры</button>
                 </div>
                 <div  class="div-table-col-right">
                     <div class="div-cards-table">

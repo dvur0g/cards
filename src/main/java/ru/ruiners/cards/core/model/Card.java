@@ -23,4 +23,5 @@ public class Card {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private CensorType type = CensorType.OK;
+
 }

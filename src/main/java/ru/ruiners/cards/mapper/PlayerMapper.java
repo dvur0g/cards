@@ -2,10 +2,10 @@ package ru.ruiners.cards.mapper;
 
 import org.mapstruct.Mapper;
 import ru.ruiners.cards.core.model.Player;
-import ru.ruiners.cards.model.PlayerRequest;
+import ru.ruiners.cards.controller.dto.PlayerDto;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = CardMapper.class)
 public interface PlayerMapper {
 
-    Player toPlayer(PlayerRequest request);
+    Player toPlayer(PlayerDto request);
 }
