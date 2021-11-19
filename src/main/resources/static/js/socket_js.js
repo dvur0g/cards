@@ -1,4 +1,4 @@
-const url = 'http://localhost:8081';
+const url = 'http://localhost:8080';
 let stompClient;
 let gameId;
 let playerType;
@@ -33,7 +33,7 @@ function createGame() {
             dataType: "json",
             contentType: "application/json",
             data: JSON.stringify({
-                "login": username
+                "username": username
             }),
             success: function (data) {
                 gameId = data.gameId;
@@ -53,9 +53,9 @@ function createGame() {
 
 
 function connectToRandom() {
-    let login = document.getElementById("login").value;
-    if (login == null || login === '') {
-        alert("Please enter login");
+    let username = document.getElementById("username").value;
+    if (username == null || username === '') {
+        alert("Please enter username");
     } else {
         $.ajax({
             url: url + "/game/connect/random",
@@ -63,14 +63,14 @@ function connectToRandom() {
             dataType: "json",
             contentType: "application/json",
             data: JSON.stringify({
-                "login": login
+                "username": username
             }),
             success: function (data) {
                 gameId = data.gameId;
                 playerType = 'O';
                 reset();
                 connectToSocket(gameId);
-                alert("Congrats you're playing with: " + data.player1.login);
+                alert("Congrats you're playing with: " + data.player1.username);
             },
             error: function (error) {
                 console.log(error);
@@ -80,9 +80,9 @@ function connectToRandom() {
 }
 
 function connectToSpecificGame() {
-    let login = document.getElementById("login").value;
-    if (login == null || login === '') {
-        alert("Please enter login");
+    let username = document.getElementById("username").value;
+    if (username == null || username === '') {
+        alert("Please enter username");
     } else {
         let gameId = document.getElementById("game_id").value;
         if (gameId == null || gameId === '') {
@@ -95,7 +95,7 @@ function connectToSpecificGame() {
             contentType: "application/json",
             data: JSON.stringify({
                 "player": {
-                    "login": login
+                    "username": username
                 },
                 "gameId": gameId
             }),
@@ -104,7 +104,7 @@ function connectToSpecificGame() {
                 playerType = 'O';
                 reset();
                 connectToSocket(gameId);
-                alert("Congrats you're playing with: " + data.player1.login);
+                alert("Congrats you're playing with: " + data.player1.username);
             },
             error: function (error) {
                 console.log(error);

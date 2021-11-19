@@ -1,12 +1,16 @@
 package ru.ruiners.cards.core.model;
 
 import lombok.Data;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.util.List;
 
 @Entity
 @Data
+@SQLDelete(sql = "UPDATE player SET deleted = true WHERE id = ?")
+@Where(clause = "deleted = false")
 public class Player {
 
     @Id
@@ -20,13 +24,12 @@ public class Player {
     )
     private Long id;
 
-    @Column(unique = true)
     private String username;
 
     private Integer score;
 
-    private Long gameId;
-
     @ManyToMany
     private List<Card> cards;
+
+    private boolean deleted = false;
 }

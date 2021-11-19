@@ -24,6 +24,8 @@ public class Game {
     @OneToMany
     private List<Player> players;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private GameState state;
 
     @ManyToOne

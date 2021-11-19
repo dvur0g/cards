@@ -20,5 +20,7 @@ public class Card {
 
     private String text;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private CensorType type = CensorType.OK;
 }

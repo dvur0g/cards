@@ -1,8 +1,6 @@
 package ru.ruiners.cards.core.service;
 
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import ru.ruiners.cards.common.BusinessException;
 import ru.ruiners.cards.core.model.Card;
@@ -41,12 +39,12 @@ public class CardsGameService {
         }
         Game game = new Game();
         game.setState(GameState.CREATED);
-        game.setPlayers(List.of(player));
         game.setMinPlayersAmount(minPlayersAmount);
 
         saveNewPlayer(player, game.getId());
-        game = repository.save(game);
+        game.setPlayers(List.of(player));
 
+        game = repository.save(game);
         return game;
     }
 
@@ -69,8 +67,8 @@ public class CardsGameService {
             throw new BusinessException("Max players amount reached");
         }
 
-        game.getPlayers().add(player);
         saveNewPlayer(player, game.getId());
+        game.getPlayers().add(player);
 
         if (game.getPlayers().size() >= game.getMinPlayersAmount()) {
             startGame(game);
@@ -89,7 +87,10 @@ public class CardsGameService {
     }
 
     private void saveNewPlayer(Player player, Long gameId) {
-        player.setGameId(gameId);
+        if (playerRepository.existsByUsername(player.getUsername())) {
+            throw new BusinessException("Player with this username playing at the moment");
+        }
+
         player.setScore(0);
         player.setCards(getRandomCards());
         playerRepository.save(player);
