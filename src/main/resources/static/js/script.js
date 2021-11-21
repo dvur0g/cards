@@ -32,8 +32,8 @@ function makeAMove(type, xCoordinate, yCoordinate) {
 }
 
 function showResponse(game) {
-    updatePlayersList(game);
-
+    updatePlayersList(game.players);
+    updateGameState(game.state);
     if (game.state === "IN_PROGRESS") {
 
     } else {
@@ -41,13 +41,17 @@ function showResponse(game) {
     }
 }
 
-function updatePlayersList(game) {
+function updatePlayersList(players) {
     let playersListText = "";
     let i = 0;
-    game.players.forEach(player => {
+    players.forEach(player => {
         playersListText += ++i + ". " + player.username + player.score + ", ";
     })
     get("playersList").innerHTML = playersListText;
+}
+
+function updateGameState(state) {
+    get("gameState").innerHTML = state;
 }
 
 function showAvailableGamesList(games) {
