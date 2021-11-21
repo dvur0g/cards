@@ -3,10 +3,7 @@ package ru.ruiners.cards.core.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.ruiners.cards.common.BusinessException;
-import ru.ruiners.cards.core.model.Card;
-import ru.ruiners.cards.core.model.Game;
-import ru.ruiners.cards.core.model.Player;
-import ru.ruiners.cards.core.model.Question;
+import ru.ruiners.cards.core.model.*;
 import ru.ruiners.cards.core.model.enums.GameState;
 import ru.ruiners.cards.core.repository.CardRepository;
 import ru.ruiners.cards.core.repository.GameRepository;
@@ -62,9 +59,9 @@ public class CardsGameService {
     public Game connectToGame(Player player, Long gameId) {
         var game = getGameById(gameId);
 
-        if (!game.getState().equals(GameState.CREATED)) {
-            throw new BusinessException("Invalid game state");
-        }
+//        if (!game.getState().equals(GameState.CREATED)) {
+//            throw new BusinessException("Invalid game state");
+//        }
         if (game.getPlayers().size() > MAX_PLAYERS_AMOUNT) {
             throw new BusinessException("Max players amount reached");
         }
@@ -94,13 +91,25 @@ public class CardsGameService {
         repository.save(game);
     }
 
-    private void saveNewPlayer(Player player) {
-        if (playerRepository.existsByUsername(player.getUsername())) {
-            throw new BusinessException("Player with this username playing at the moment");
+    public Game gamePlay(GamePlay gamePlay) {
+        Game game = repository.findById(gamePlay.getGameId()).orElseThrow(
+                () -> new BusinessException("Game not found")
+        );
+
+        if (game.getPlayers().stream().noneMatch(player -> player.getUsername().equals(gamePlay.getUsername()))) {
+            throw new BusinessException("No such player in the game");
         }
 
+        return game;
+    }
+
+    private void saveNewPlayer(Player player) {
+//        TODO вернуть в проде
+//        if (playerRepository.existsByUsername(player.getUsername())) {
+//            throw new BusinessException("Player with this username playing at the moment");
+//        }
+
         player.setScore(0);
-        player.setCards(getRandomCards());
         playerRepository.save(player);
     }
 
@@ -113,7 +122,7 @@ public class CardsGameService {
     }
 
     public List<Game> getGamesToConnect() {
-        return repository.findAllByState(GameState.CREATED);
+        return repository.findAllByStateIn(List.of(GameState.CREATED, GameState.IN_PROGRESS));
     }
 
     private Game getGameById(Long gameId) {

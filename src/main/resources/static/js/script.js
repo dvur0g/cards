@@ -33,23 +33,36 @@ function makeAMove(type, xCoordinate, yCoordinate) {
     })
 }
 
-function displayResponse(data) {
-    let board = data.board;
-    for (let i = 0; i < board.length; i++) {
-        for (let j = 0; j < board[i].length; j++) {
-            if (board[i][j] === 1) {
-                turns[i][j] = 'X'
-            } else if (board[i][j] === 2) {
-                turns[i][j] = 'O';
-            }
-            let id = i + "_" + j;
-            $("#" + id).text(turns[i][j]);
-        }
+function displayResponse(game) {
+    let playersList = "";
+    let i = 0;
+    game.players.forEach(player => {
+        playersList += ++i + " " + player.username + player.score + "\n";
+    })
+    get("playersList").innerHTML = playersList;
+
+    if (game.state === "IN_PROGRESS") {
+
+    } else {
+
     }
-    if (data.winner != null) {
-        alert("Winner is " + data.winner);
-    }
-    gameOn = true;
+
+    // let board = game.board;
+    // for (let i = 0; i < board.length; i++) {
+    //     for (let j = 0; j < board[i].length; j++) {
+    //         if (board[i][j] === 1) {
+    //             turns[i][j] = 'X'
+    //         } else if (board[i][j] === 2) {
+    //             turns[i][j] = 'O';
+    //         }
+    //         let id = i + "_" + j;
+    //         $("#" + id).text(turns[i][j]);
+    //     }
+    // }
+    // if (game.winner != null) {
+    //     alert("Winner is " + game.winner);
+    // }
+    // gameOn = true;
 }
 
 $(".tic").click(function () {
@@ -65,3 +78,7 @@ function reset() {
 $("#reset").click(function () {
     reset();
 });
+
+function get(element) {
+    return document.getElementById(element);
+}

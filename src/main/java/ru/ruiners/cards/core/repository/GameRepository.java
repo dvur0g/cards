@@ -12,6 +12,6 @@ import java.util.Optional;
 @Repository
 public interface GameRepository extends CrudRepository<Game, Long> {
 
-    List<Game> findAllByState(GameState state);
+    List<Game> findAllByStateIn(List<GameState> state);
 
 }

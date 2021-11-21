@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.ruiners.cards.controller.dto.ConnectDto;
 import ru.ruiners.cards.controller.dto.GameDto;
 import ru.ruiners.cards.core.model.Game;
+import ru.ruiners.cards.core.model.GamePlay;
 import ru.ruiners.cards.core.service.CardsGameService;
 import ru.ruiners.cards.mapper.GameMapper;
 import ru.ruiners.cards.mapper.PlayerMapper;
@@ -64,11 +65,13 @@ public class GameController {
         return ResponseEntity.ok(availableGamesList.stream().map(gameMapper::toDto).collect(Collectors.toList()));
     }
 
-//    @PostMapping("/gameplay")
-//    public ResponseEntity<Game> gamePlay(@RequestBody GamePlay request) throws NotFoundException, InvalidGameException {
-//        log.info("gameplay: {}", request);
-//        Game game = gameService.gamePlay(request);
-//        simpMessagingTemplate.convertAndSend("/topic/game-progress/" + game.getGameId(), game);
-//        return ResponseEntity.ok(game);
-//    }
+    @PostMapping("/gameplay")
+    public ResponseEntity<GameDto> gamePlay(@RequestBody GamePlay request) {
+        log.info("gameplay: {}", request);
+        GameDto gameDto = gameMapper.toDto(gameService.gamePlay(request));
+
+        simpMessagingTemplate.convertAndSend("/topic/game-progress/" + gameDto.getId(), gameDto);
+        return ResponseEntity.ok(gameDto);
+    }
+
 }

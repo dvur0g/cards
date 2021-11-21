@@ -4,20 +4,23 @@ let gameId;
 let username;
 let playerType;
 
+let game;
+
 function showMenu() {
     document.getElementById("menu").style.visibility = "visible";
 }
 
 function connectToSocket(gameId) {
 
-    console.log("connecting to the game");
+    console.log("connecting to the game " + gameId);
     let socket = new SockJS(url + "/gameplay");
     stompClient = Stomp.over(socket);
     stompClient.connect({}, function (frame) {
         console.log("connected to the frame: " + frame);
         stompClient.subscribe("/topic/game-progress/" + gameId, function (response) {
+            console.log("SUBSCRIBED")
             let data = JSON.parse(response.body);
-            console.log(data);
+            console.log("connectToSocket game: " + data);
             displayResponse(data);
         })
     })
@@ -57,12 +60,12 @@ function createGame() {
             data: JSON.stringify({
                 "username": username
             }),
-            success: function (data) {
-                gameId = data.gameId;
+            success: function (game) {
+                gameId = game.gameId;
                 playerType = 'X';
                 reset();
                 connectToSocket(gameId);
-                alert("Your created a game. Game id is: " + data.gameId);
+                alert("Your created a game. Game id is: " + game.gameId);
                 gameOn = true;
             },
             error: function (error) {
@@ -127,11 +130,11 @@ function connectToSpecificGame(gameId) {
                 "gameId": gameId
             }),
             success: function (data) {
-                gameId = data.gameId;
+                gameId = data.id;
                 playerType = 'O';
                 reset();
                 connectToSocket(gameId);
-                alert("Congrats you're playing with: " + data.player1.username);
+                // alert("Congrats you're playing with: " + data.player1.username);
             },
             error: function (error) {
                 console.log(error);
@@ -145,22 +148,23 @@ function getAvailableGamesList() {
         url: url + "/game/list",
         type: 'GET',
         success: function (gamesList) {
-            showUL(gamesList)
-            gamesList.forEach(element => {
-                console.log(element.id + ", " + element.minPlayersAmount + ", " + element.state)
-
-            });
-            },
+            showList(gamesList)
+        },
         error: function (error) {
             console.log(error);
         }
     })
 }
 
-function showUL(array) {
+// let gameIds
+
+function showList(array) {
     const list = document.createElement('ul');
 
+    // gameIds = {}
     for (let i = 0; i < array.length; i++) {
+        // gameIds.add(array[i])
+
         const item = document.createElement('li');
 
         item.appendChild(document.createTextNode(array[i].id + ", " + array[i].state));
@@ -170,7 +174,7 @@ function showUL(array) {
 
         list.appendChild(item);
     }
-
+    document.getElementById('gamesList').innerHTML = '';
     document.getElementById('gamesList').appendChild(list);
 }
 

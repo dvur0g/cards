@@ -18,5 +18,9 @@ public class Question {
     )
     private Long id;
     private String text;
-    private CensorType type;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private CensorType type = CensorType.OK;
+
 }

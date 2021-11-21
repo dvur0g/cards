@@ -32,4 +32,5 @@ public class Player {
     private List<Card> cards;
 
     private boolean deleted = false;
+
 }

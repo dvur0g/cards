@@ -38,4 +38,5 @@ public class Game {
 
     @ManyToOne
     private Player winner;
+
 }
