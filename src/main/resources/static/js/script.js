@@ -32,18 +32,22 @@ function makeAMove(type, xCoordinate, yCoordinate) {
 }
 
 function showResponse(game) {
-    let playersListText = "";
-    let i = 0;
-    game.players.forEach(player => {
-        playersListText += ++i + ". " + player.username + player.score + ", ";
-    })
-    get("playersList").innerHTML = playersListText;
+    updatePlayersList(game);
 
     if (game.state === "IN_PROGRESS") {
 
     } else {
 
     }
+}
+
+function updatePlayersList(game) {
+    let playersListText = "";
+    let i = 0;
+    game.players.forEach(player => {
+        playersListText += ++i + ". " + player.username + player.score + ", ";
+    })
+    get("playersList").innerHTML = playersListText;
 }
 
 function showAvailableGamesList(games) {
@@ -62,6 +66,10 @@ function showAvailableGamesList(games) {
 
     document.getElementById('gamesList').innerHTML = '';
     document.getElementById('gamesList').appendChild(list);
+}
+
+function showMenu() {
+    get("menu").style.visibility = "visible";
 }
 
 function get(element) {

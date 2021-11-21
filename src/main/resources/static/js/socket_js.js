@@ -5,22 +5,22 @@ let gameId;
 let username;
 let game;
 
-function connectToSocket(gameId) {
-    console.log("connecting to the game " + gameId);
+function connectToSocket(game) {
+    console.log("connecting to the game " + game.id);
     
     let socket = new SockJS(url + "/gameplay");
     stompClient = Stomp.over(socket);
     stompClient.connect({}, function (frame) {
         console.log("connected to the frame: " + frame);
-        stompClient.subscribe("/topic/game-progress/" + gameId, function (response) {
+        stompClient.subscribe("/topic/game-progress/" + game.id, function (response) {
             console.log("SUBSCRIBED")
             let data = JSON.parse(response.body);
-            console.log("connectToSocket game: " + data);
             showResponse(data);
         })
     })
 
     get("menu").style.visibility = "hidden";
+    showResponse(game);
 }
 
 function disconnectFromGame() {
@@ -57,8 +57,7 @@ function createGame() {
         }),
         success: function (game) {
             gameId = game.id;
-            connectToSocket(gameId);
-            showResponse(game);
+            connectToSocket(game);
             alert("Your created a game. Game id is: " + game.id);
             },
         error: function (error) {
@@ -85,10 +84,8 @@ function connectToRandom() {
         data: JSON.stringify({
             "username": username
         }),
-        success: function (data) {
-            gameId = data.gameId;
-            connectToSocket(gameId);
-            alert("Congrats you're playing with: " + data.player1.username);
+        success: function (game) {
+            connectToSocket(game);
             }, 
         error: function (error) {
             console.log(error);
@@ -119,11 +116,9 @@ function connectToGame(gameId) {
                 },
                 "gameId": gameId
             }),
-            success: function (data) {
-                gameId = data.id;
-                connectToSocket(gameId);
-                // alert("Congrats you're playing with: " + data.player1.username);
-            },
+            success: function (game) {
+                connectToSocket(game);
+                },
             error: function (error) {
                 console.log(error);
             }
@@ -142,8 +137,4 @@ function getAvailableGames() {
             console.log(error);
         }
     })
-}
-
-function showMenu() {
-    get("menu").style.visibility = "visible";
 }
