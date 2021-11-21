@@ -77,8 +77,13 @@ public class CardsGameService {
     }
 
     @Transactional
-    public void disconnectFromGame(Player player) {
-        playerRepository.deleteByUsername(player.getUsername());
+    public Game disconnectFromGame(Player player) {
+        Long gameId = playerRepository.getGameIdByUsername(player.getUsername());
+        Game game = repository.findById(gameId).orElseThrow(() -> new BusinessException("Game not found"));
+
+        game.getPlayers().removeIf(p -> p.getUsername().equals(player.getUsername()));
+        repository.save(game);
+        return game;
     }
 
     private void startGame(Game game) {

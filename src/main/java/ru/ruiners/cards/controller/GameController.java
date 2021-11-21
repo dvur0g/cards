@@ -30,39 +30,48 @@ public class GameController {
     private final SimpMessagingTemplate simpMessagingTemplate;
 
     private static final int MIN_PLAYERS_AMOUNT = 2;
+    private static final String TOPIC = "/topic/game-progress/";
 
-    @PostMapping("/start")
+    @PostMapping("/create")
     public ResponseEntity<GameDto> start(@RequestBody PlayerDto player) {
-        log.info("start game request: {}", player);
+        log.info("create game request: {}", player);
         Game game = gameService.createGame(playerMapper.toPlayer(player), MIN_PLAYERS_AMOUNT);
+
         return ResponseEntity.ok(gameMapper.toDto(game));
     }
 
     @PostMapping("/connect")
     public ResponseEntity<GameDto> connect(@RequestBody ConnectDto request) {
         log.info("connect request: {}", request);
-        Game game = gameService.connectToGame(playerMapper.toPlayer(request.getPlayer()), request.getGameId());
-        return ResponseEntity.ok(gameMapper.toDto(game));
+        GameDto game = gameMapper.toDto(gameService.connectToGame(playerMapper.toPlayer(request.getPlayer()), request.getGameId()));
+        simpMessagingTemplate.convertAndSend(TOPIC + game.getId(), game);
+
+        return ResponseEntity.ok(game);
     }
 
     @PostMapping("/disconnect")
     public void disconnect(@RequestBody PlayerDto player) {
         log.info("disconnect request: {}", player);
-        gameService.disconnectFromGame(playerMapper.toPlayer(player));
+        GameDto game = gameMapper.toDto(gameService.disconnectFromGame(playerMapper.toPlayer(player)));
+        simpMessagingTemplate.convertAndSend(TOPIC + game.getId(), game);
     }
 
     @PostMapping("/connect/random")
     public ResponseEntity<GameDto> connectRandom(@RequestBody PlayerDto player) {
         log.info("connect random {}", player);
-        Game game = gameService.connectToRandomGame(playerMapper.toPlayer(player));
-        return ResponseEntity.ok(gameMapper.toDto(game));
+        GameDto game = gameMapper.toDto(gameService.connectToRandomGame(playerMapper.toPlayer(player)));
+        simpMessagingTemplate.convertAndSend(TOPIC + game.getId(), game);
+
+        return ResponseEntity.ok(game);
     }
 
     @GetMapping("/list")
     public ResponseEntity<List<GameDto>> getAvailableGamesList() {
         List<Game> availableGamesList = gameService.getGamesToConnect();
         log.info("get games list: {}", availableGamesList);
-        return ResponseEntity.ok(availableGamesList.stream().map(gameMapper::toDto).collect(Collectors.toList()));
+
+        return ResponseEntity.ok(availableGamesList.stream().map(gameMapper::toDto)
+                .collect(Collectors.toList()));
     }
 
     @PostMapping("/gameplay")
@@ -70,7 +79,7 @@ public class GameController {
         log.info("gameplay: {}", request);
         GameDto gameDto = gameMapper.toDto(gameService.gamePlay(request));
 
-        simpMessagingTemplate.convertAndSend("/topic/game-progress/" + gameDto.getId(), gameDto);
+        simpMessagingTemplate.convertAndSend(TOPIC + gameDto.getId(), gameDto);
         return ResponseEntity.ok(gameDto);
     }
 

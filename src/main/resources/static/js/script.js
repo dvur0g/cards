@@ -1,14 +1,13 @@
 let turns = [["#", "#", "#"], ["#", "#", "#"], ["#", "#", "#"]];
 let turn = "";
-let gameOn = false;
 
 function playerTurn(turn, id) {
-    if (gameOn) {
-        let spotTaken = $("#" + id).text();
-        if (spotTaken === "#") {
-            makeAMove(playerType, id.split("_")[0], id.split("_")[1]);
-        }
-    }
+    // if (gameOn) {
+    //     let spotTaken = $("#" + id).text();
+    //     if (spotTaken === "#") {
+    //         makeAMove(playerType, id.split("_")[0], id.split("_")[1]);
+    //     }
+    // }
 }
 
 function makeAMove(type, xCoordinate, yCoordinate) {
@@ -24,8 +23,7 @@ function makeAMove(type, xCoordinate, yCoordinate) {
             "gameId": gameId
         }),
         success: function (data) {
-            gameOn = false;
-            displayResponse(data);
+            showResponse(data);
         },
         error: function (error) {
             console.log(error);
@@ -33,51 +31,38 @@ function makeAMove(type, xCoordinate, yCoordinate) {
     })
 }
 
-function displayResponse(game) {
-    let playersList = "";
+function showResponse(game) {
+    let playersListText = "";
     let i = 0;
     game.players.forEach(player => {
-        playersList += ++i + " " + player.username + player.score + "\n";
+        playersListText += ++i + ". " + player.username + player.score + ", ";
     })
-    get("playersList").innerHTML = playersList;
+    get("playersList").innerHTML = playersListText;
 
     if (game.state === "IN_PROGRESS") {
 
     } else {
 
     }
-
-    // let board = game.board;
-    // for (let i = 0; i < board.length; i++) {
-    //     for (let j = 0; j < board[i].length; j++) {
-    //         if (board[i][j] === 1) {
-    //             turns[i][j] = 'X'
-    //         } else if (board[i][j] === 2) {
-    //             turns[i][j] = 'O';
-    //         }
-    //         let id = i + "_" + j;
-    //         $("#" + id).text(turns[i][j]);
-    //     }
-    // }
-    // if (game.winner != null) {
-    //     alert("Winner is " + game.winner);
-    // }
-    // gameOn = true;
 }
 
-$(".tic").click(function () {
-    let slot = $(this).attr('id');
-    playerTurn(turn, slot);
-});
+function showAvailableGamesList(games) {
+    const list = document.createElement('ul');
 
-function reset() {
-    turns = [["#", "#", "#"], ["#", "#", "#"], ["#", "#", "#"]];
-    $(".tic").text("#");
+    for (let i = 0; i < games.length; i++) {
+        const item = document.createElement('li');
+
+        item.appendChild(document.createTextNode(games[i].id + ", " + games[i].state));
+        item.onclick = function() {
+            connectToGame(games[i].id)
+        };
+
+        list.appendChild(item);
+    }
+
+    document.getElementById('gamesList').innerHTML = '';
+    document.getElementById('gamesList').appendChild(list);
 }
-
-$("#reset").click(function () {
-    reset();
-});
 
 function get(element) {
     return document.getElementById(element);
