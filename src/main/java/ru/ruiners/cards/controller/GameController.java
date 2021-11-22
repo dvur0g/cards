@@ -43,10 +43,14 @@ public class GameController {
     @PostMapping("/connect")
     public ResponseEntity<GameDto> connect(@RequestBody ConnectDto request) {
         log.info("connect request: {}", request);
-        GameDto game = gameMapper.toDto(gameService.connectToGame(playerMapper.toPlayer(request.getPlayer()), request.getGameId()));
-        simpMessagingTemplate.convertAndSend(TOPIC + game.getId(), game);
+        Game game = gameService.connectToGame(playerMapper.toPlayer(request.getPlayer()), request.getGameId());
+        GameDto gameDto = gameMapper.toDto(game);
 
-        return ResponseEntity.ok(game);
+        log.info("send game to all players {}", game);
+        log.info("send gameDto to all players {}", gameDto);
+        simpMessagingTemplate.convertAndSend(TOPIC + gameDto.getId(), gameDto);
+
+        return ResponseEntity.ok(gameDto);
     }
 
     @PostMapping("/disconnect")

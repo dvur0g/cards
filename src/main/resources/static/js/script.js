@@ -3,6 +3,8 @@ function update(game) {
     updatePlayersList(game.players);
     updateGameState(game.state);
     updateCardHolders(game.players);
+    updateCurrentPlayer(game.currentPlayer);
+
     if (game.state === "IN_PROGRESS") {
 
     } else {
@@ -30,18 +32,22 @@ function updateCardHolders(players) {
 
     if (!!cards) {
         for (; i < cards.length; ++i) {
-            let element = get("cardHolder" + i);
-            element.style.visibility = "visible";
-            element.innerHTML = cards[i].text;
+            let cardHolder = get("cardHolder" + i);
+            cardHolder.style.visibility = "visible";
+            cardHolder.innerHTML = cards[i].text;
 
-            console.log(Object.getOwnPropertyNames(cards[i]));
-            console.log("card " + i + ": [" + cards[i].id + ", " + cards[i].text + ", " + cards[i].type + "]");
+            get("cardHolder" + i + "Id").innerHTML = cards[i].id;
         }
     }
 
     for (; i < 10; ++i) {
-        get("cardHolder" + i).style.visibility = "hidden";
+        hide("cardHolder" + i);
+        get("cardHolder" + i + "Id").innerHTML = "";
     }
+}
+
+function updateCurrentPlayer(player) {
+
 }
 
 function showAvailableGamesList(games) {
@@ -58,14 +64,24 @@ function showAvailableGamesList(games) {
         list.appendChild(item);
     }
 
-    document.getElementById('gamesList').innerHTML = '';
-    document.getElementById('gamesList').appendChild(list);
+    get('gamesList').innerHTML = '';
+    get('gamesList').appendChild(list);
+}
+
+function selectCard(cardHolderIndex) {
+
+
+    hide("cardHolder" + cardHolderIndex);
 }
 
 function showMenu() {
     get("menu").style.visibility = "visible";
 }
 
-function get(element) {
-    return document.getElementById(element);
+function hide(elementId) {
+    get(elementId).style.visibility = "hidden";
+}
+
+function get(elementId) {
+    return document.getElementById(elementId);
 }

@@ -1,10 +1,12 @@
 package ru.ruiners.cards.core.model;
 
+import lombok.Data;
 import ru.ruiners.cards.core.model.enums.CensorType;
 
 import javax.persistence.*;
 
 @Entity
+@Data
 public class Card {
 
     @Id
