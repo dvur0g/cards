@@ -28,7 +28,7 @@ public class Player {
 
     private Integer score;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     private List<Card> cards;
 
     private boolean deleted = false;
