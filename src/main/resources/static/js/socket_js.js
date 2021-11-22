@@ -1,17 +1,16 @@
 const url = 'http://localhost:8080';
 let stompClient;
 
-let gameId;
-
 let username = null;
 let password = null;
+let authHeader = "Authorization"
 
 function connectToSocket(game) {
     console.log("connecting to the game " + game.id);
     
     let socket = new SockJS(url + "/gameplay");
     stompClient = Stomp.over(socket);
-    stompClient.connect({}, function (frame) {
+    stompClient.connect({ authHeader:auth() }, function (frame) {
         console.log("connected to the frame: " + frame);
         stompClient.subscribe("/topic/game-progress/" + game.id, function (response) {
             let data = JSON.parse(response.body);
@@ -32,7 +31,7 @@ function disconnectFromGame() {
         dataType: "json",
         contentType: "application/json",
         headers: {
-            "Authorization": auth()
+            authHeader: auth()
         },
         data: JSON.stringify({
             "username": username
@@ -54,13 +53,12 @@ function createGame() {
         dataType: "json",
         contentType: "application/json",
         headers: {
-            "Authorization": auth()
+            authHeader: auth()
         },
         data: JSON.stringify({
             "username": username
         }),
         success: function (game) {
-            gameId = game.id;
             connectToSocket(game);
             alert("Your created a game. Game id is: " + game.id);
             },
@@ -81,7 +79,7 @@ function connectToGame(gameId) {
         dataType: "json",
         contentType: "application/json",
         headers: {
-            "Authorization": auth()
+            authHeader: auth()
         },
         data: JSON.stringify({
             "player": {
@@ -107,7 +105,7 @@ function getAvailableGames() {
     $.ajax({
         url: url + "/game/list",
         headers: {
-            'Authorization': auth()
+            authHeader: auth()
         },
         type: 'GET',
         success: function (gamesList) {
