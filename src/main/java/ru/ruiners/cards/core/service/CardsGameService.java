@@ -98,10 +98,9 @@ public class CardsGameService {
     }
 
     private void saveNewPlayer(Player player) {
-//        TODO вернуть в проде
-//        if (playerRepository.existsByUsername(player.getUsername())) {
-//            throw new BusinessException("Player with this username playing at the moment");
-//        }
+        if (playerRepository.existsByUsername(player.getUsername())) {
+            throw new BusinessException("Player with this username playing at the moment");
+        }
 
         player.setScore(0);
         playerRepository.save(player);

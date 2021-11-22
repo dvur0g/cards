@@ -51,8 +51,17 @@ function updateCurrentPlayer(player) {
     }
 }
 
-function updateCurrentUsername(username) {
-    get("currentUsername").innerHTML = username;
+function updateCurrentUsername() {
+    let usernameValue = get("username").value;
+
+    if (usernameValue == null || usernameValue === '') {
+        alert("Please enter username");
+        return false;
+    }
+
+    username = usernameValue;
+    get("currentUsername").innerHTML = usernameValue;
+    return true;
 }
 
 function showAvailableGamesList(games) {

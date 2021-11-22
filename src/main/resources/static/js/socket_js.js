@@ -21,7 +21,6 @@ function connectToSocket(game) {
 
     get("menu").style.visibility = "hidden";
     update(game);
-    updateCurrentUsername(username);
 }
 
 function disconnectFromGame() {
@@ -42,14 +41,10 @@ function disconnectFromGame() {
 }
 
 function createGame() {
-    let usernameValue = get("username").value;
-
-    if (usernameValue == null || usernameValue === '') {
-        alert("Please enter username");
+    if (!updateCurrentUsername()) {
         return;
     }
-    
-    username = usernameValue;
+
     $.ajax({
         url: url + "/game/create",
         type: 'POST',
@@ -70,19 +65,15 @@ function createGame() {
 }
 
 function connectToGame(gameId) {
-    let usernameValue = get("username").value;
-
-    if (usernameValue == null || usernameValue === '') {
-        alert("Please enter username");
-        return;
-    }
-
     if (gameId == null || gameId === '') {
         alert("Please enter game id");
         return;
     }
 
-    username = usernameValue;
+    if (!updateCurrentUsername()) {
+        return;
+    }
+
     $.ajax({
         url: url + "/game/connect",
         type: 'POST',
