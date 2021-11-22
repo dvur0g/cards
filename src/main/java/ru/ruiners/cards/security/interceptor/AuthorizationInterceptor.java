@@ -24,7 +24,6 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws JsonProcessingException {
         String authorizationString = request.getHeader("Authorization");
         AuthenticateDto authorization = objectMapper.readValue(authorizationString, AuthenticateDto.class);
-
         return authorizationService.authenticate(authorization);
     }
 
