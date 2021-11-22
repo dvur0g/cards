@@ -71,32 +71,33 @@ function connectToGame(gameId) {
 
     if (usernameValue == null || usernameValue === '') {
         alert("Please enter username");
-    } else {
-        if (gameId == null || gameId === '') {
-            alert("Please enter game id");
-        }
-
-        username = usernameValue;
-
-        $.ajax({
-            url: url + "/game/connect",
-            type: 'POST',
-            dataType: "json",
-            contentType: "application/json",
-            data: JSON.stringify({
-                "player": {
-                    "username": username
-                },
-                "gameId": gameId
-            }),
-            success: function (game) {
-                connectToSocket(game);
-                },
-            error: function (error) {
-                console.log(error);
-            }
-        })
+        return;
     }
+
+    if (gameId == null || gameId === '') {
+        alert("Please enter game id");
+        return;
+    }
+
+    username = usernameValue;
+    $.ajax({
+        url: url + "/game/connect",
+        type: 'POST',
+        dataType: "json",
+        contentType: "application/json",
+        data: JSON.stringify({
+            "player": {
+                "username": username
+            },
+            "gameId": gameId
+        }),
+        success: function (game) {
+            connectToSocket(game);
+            },
+        error: function (error) {
+            console.log(error);
+        }
+    })
 }
 
 function getAvailableGames() {

@@ -1,35 +1,3 @@
-let turns = [["#", "#", "#"], ["#", "#", "#"], ["#", "#", "#"]];
-let turn = "";
-
-function playerTurn(turn, id) {
-    // if (gameOn) {
-    //     let spotTaken = $("#" + id).text();
-    //     if (spotTaken === "#") {
-    //         makeAMove(playerType, id.split("_")[0], id.split("_")[1]);
-    //     }
-    // }
-}
-
-function makeAMove(type, xCoordinate, yCoordinate) {
-    $.ajax({
-        url: url + "/game/gameplay",
-        type: 'POST',
-        dataType: "json",
-        contentType: "application/json",
-        data: JSON.stringify({
-            "type": type,
-            "coordinateX": xCoordinate,
-            "coordinateY": yCoordinate,
-            "gameId": gameId
-        }),
-        success: function (game) {
-            update(game);
-        },
-        error: function (error) {
-            console.log(error);
-        }
-    })
-}
 
 function update(game) {
     updatePlayersList(game.players);
