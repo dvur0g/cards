@@ -32,22 +32,23 @@ function updateCardHolders(players) {
 
     if (!!cards) {
         for (; i < cards.length; ++i) {
-            let cardHolder = get("cardHolder" + i);
-            cardHolder.style.visibility = "visible";
-            cardHolder.innerHTML = cards[i].text;
+            visible("cardHolder" + i);
 
-            get("cardHolder" + i + "Id").innerHTML = cards[i].id;
+            get("cardHolder" + i + "id").innerHTML = cards[i].id;
+            get("cardHolder" + i + "text").innerHTML = cards[i].text;
         }
     }
 
     for (; i < 10; ++i) {
         hide("cardHolder" + i);
-        get("cardHolder" + i + "Id").innerHTML = "";
+        get("cardHolder" + i + "id").innerHTML = "";
     }
 }
 
 function updateCurrentPlayer(player) {
-
+    if (!!player) {
+        get("currentPlayer").innerHTML = player.username;
+    }
 }
 
 function showAvailableGamesList(games) {
@@ -80,6 +81,10 @@ function showMenu() {
 
 function hide(elementId) {
     get(elementId).style.visibility = "hidden";
+}
+
+function visible(elementId) {
+    get(elementId).style.visibility = "visible";
 }
 
 function get(elementId) {

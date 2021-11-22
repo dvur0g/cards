@@ -43,10 +43,9 @@ public class GameController {
     @PostMapping("/connect")
     public ResponseEntity<GameDto> connect(@RequestBody ConnectDto request) {
         log.info("connect request: {}", request);
-        Game game = gameService.connectToGame(playerMapper.toPlayer(request.getPlayer()), request.getGameId());
-        GameDto gameDto = gameMapper.toDto(game);
 
-        log.info("send game to all players {}", game);
+        GameDto gameDto = gameMapper.toDto(
+                gameService.connectToGame(playerMapper.toPlayer(request.getPlayer()), request.getGameId()));
         log.info("send gameDto to all players {}", gameDto);
         simpMessagingTemplate.convertAndSend(TOPIC + gameDto.getId(), gameDto);
 
