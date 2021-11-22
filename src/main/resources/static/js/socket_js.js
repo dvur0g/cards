@@ -2,8 +2,9 @@ const url = 'http://localhost:8080';
 let stompClient;
 
 let gameId;
-let username;
-let game;
+
+let username = null;
+let password = null;
 
 function connectToSocket(game) {
     console.log("connecting to the game " + game.id);
@@ -30,6 +31,9 @@ function disconnectFromGame() {
         type: 'POST',
         dataType: "json",
         contentType: "application/json",
+        headers: {
+            "Authorization": auth()
+        },
         data: JSON.stringify({
             "username": username
         })
@@ -49,6 +53,9 @@ function createGame() {
         type: 'POST',
         dataType: "json",
         contentType: "application/json",
+        headers: {
+            "Authorization": auth()
+        },
         data: JSON.stringify({
             "username": username
         }),
@@ -78,6 +85,9 @@ function connectToGame(gameId) {
         type: 'POST',
         dataType: "json",
         contentType: "application/json",
+        headers: {
+            "Authorization": auth()
+        },
         data: JSON.stringify({
             "player": {
                 "username": username
@@ -96,6 +106,9 @@ function connectToGame(gameId) {
 function getAvailableGames() {
     $.ajax({
         url: url + "/game/list",
+        headers: {
+            'Authorization': auth()
+        },
         type: 'GET',
         success: function (gamesList) {
             showAvailableGamesList(gamesList)
@@ -104,4 +117,11 @@ function getAvailableGames() {
             console.log(error);
         }
     })
+}
+
+function auth() {
+    return JSON.stringify({
+        "username": username,
+        "password": password
+    });
 }

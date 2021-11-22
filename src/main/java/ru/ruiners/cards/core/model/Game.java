@@ -21,7 +21,7 @@ public class Game {
     )
     private Long id;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     private List<Player> players;
 
     @Enumerated(EnumType.STRING)

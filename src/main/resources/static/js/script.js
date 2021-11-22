@@ -65,6 +65,8 @@ function updateCurrentUsername() {
     }
 
     username = usernameValue;
+    password = get("password").value;
+
     get("currentUsername").innerHTML = username;
     return true;
 }
@@ -107,7 +109,9 @@ function visible(elementId) {
 
 function clearUsername() {
     username = null;
+    password = null;
     clear("currentUsername");
+    clear("password");
 }
 
 function clear(elementId) {

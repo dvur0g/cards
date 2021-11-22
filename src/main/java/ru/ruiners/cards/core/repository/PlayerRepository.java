@@ -11,6 +11,8 @@ public interface PlayerRepository extends CrudRepository<Player, Long> {
 
     boolean existsByUsername(String username);
 
+    Optional<Player> findByUsername(String username);
+
     void deleteByUsername(String username);
 
     @Query(value = "SELECT gp.game_id FROM game_players gp " +

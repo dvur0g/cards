@@ -1,10 +1,16 @@
 package ru.ruiners.cards.core.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import ru.ruiners.cards.common.BusinessException;
+import ru.ruiners.cards.controller.dto.GameDto;
 import ru.ruiners.cards.controller.dto.GamePlayDto;
-import ru.ruiners.cards.core.model.*;
+import ru.ruiners.cards.core.mapper.GameMapper;
+import ru.ruiners.cards.core.model.Card;
+import ru.ruiners.cards.core.model.Game;
+import ru.ruiners.cards.core.model.Player;
+import ru.ruiners.cards.core.model.Question;
 import ru.ruiners.cards.core.model.enums.GameState;
 import ru.ruiners.cards.core.repository.CardRepository;
 import ru.ruiners.cards.core.repository.GameRepository;
@@ -14,25 +20,32 @@ import ru.ruiners.cards.core.repository.QuestionRepository;
 import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class CardsGameService {
+public class GameService {
 
     private static final int MIN_PLAYERS_AMOUNT = 2;
     private static final int MAX_PLAYERS_AMOUNT = 10;
-
     private static final int STARTING_CARDS_AMOUNT = 10;
+
+    private static final String TOPIC = "/topic/game-progress/";
 
     private final GameRepository repository;
     private final CardRepository cardRepository;
     private final QuestionRepository questionRepository;
     private final PlayerRepository playerRepository;
 
+    private final SimpMessagingTemplate simpMessagingTemplate;
+
+    private final GameMapper mapper;
+
     private final Random random = new Random();
 
+
     @Transactional
-    public Game createGame(Player player, Integer minPlayersAmount) {
+    public GameDto createGame(Player player, Integer minPlayersAmount) {
         if (minPlayersAmount > MAX_PLAYERS_AMOUNT || minPlayersAmount < MIN_PLAYERS_AMOUNT) {
             throw new BusinessException("Invalid players amount");
         }
@@ -44,11 +57,11 @@ public class CardsGameService {
         game.setPlayers(List.of(player));
 
         game = repository.save(game);
-        return game;
+        return mapper.toDto(game);
     }
 
     @Transactional
-    public Game connectToGame(Player player, Long gameId) {
+    public GameDto connectToGame(Player player, Long gameId) {
         var game = getGameById(gameId);
 
         if (game.getPlayers().size() > MAX_PLAYERS_AMOUNT) {
@@ -62,11 +75,14 @@ public class CardsGameService {
             startGame(game);
         }
         repository.save(game);
-        return game;
+
+        GameDto result = mapper.toDto(game);
+        simpMessagingTemplate.convertAndSend(TOPIC + result.getId(), result);
+        return result;
     }
 
     @Transactional
-    public Game disconnectFromGame(Player player) {
+    public void disconnectFromGame(Player player) {
         if (player.getUsername() == null) {
             throw new BusinessException("Null username");
         }
@@ -78,9 +94,9 @@ public class CardsGameService {
                 .orElseThrow(() -> new BusinessException("Game not found"));
 
         game.getPlayers().removeIf(p -> p.getUsername().equals(player.getUsername()));
-        game = repository.save(game);
-        playerRepository.deleteByUsername(player.getUsername());
-        return game;
+
+        GameDto result = mapper.toDto(repository.save(game));
+        simpMessagingTemplate.convertAndSend(TOPIC + result.getId(), result);
     }
 
     private void startGame(Game game) {
@@ -93,7 +109,7 @@ public class CardsGameService {
         repository.save(game);
     }
 
-    public Game gamePlay(GamePlayDto gamePlay) {
+    public GameDto gamePlay(GamePlayDto gamePlay) {
         Game game = repository.findById(gamePlay.getGameId()).orElseThrow(
                 () -> new BusinessException("Game not found")
         );
@@ -102,16 +118,28 @@ public class CardsGameService {
             throw new BusinessException("No such player in the game");
         }
 
-        return game;
+        GameDto result = mapper.toDto(repository.save(game));
+        simpMessagingTemplate.convertAndSend(TOPIC + result.getId(), result);
+        return result;
     }
 
     private void saveNewPlayer(Player player) {
-        if (playerRepository.existsByUsername(player.getUsername())) {
-            throw new BusinessException("Player with this username playing at the moment");
-        }
-
+        playerRepository.getGameIdByUsername(player.getUsername())
+                .ifPresent(gameId -> repository.findById(gameId)
+                        .get().getPlayers()
+                        .removeIf(p -> p.getUsername().equals(player.getUsername()))
+                );
         player.setScore(0);
         playerRepository.save(player);
+    }
+
+    public List<GameDto> getGamesToConnect() {
+        return repository.findAllByStateIn(List.of(GameState.CREATED, GameState.IN_PROGRESS))
+                .stream().map(mapper::toDto).collect(Collectors.toList());
+    }
+
+    private Game getGameById(Long gameId) {
+        return repository.findById(gameId).orElseThrow(() -> new BusinessException("Game not found"));
     }
 
     private List<Card> getRandomCards() {
@@ -122,11 +150,4 @@ public class CardsGameService {
         return questionRepository.getRandomQuestion();
     }
 
-    public List<Game> getGamesToConnect() {
-        return repository.findAllByStateIn(List.of(GameState.CREATED, GameState.IN_PROGRESS));
-    }
-
-    private Game getGameById(Long gameId) {
-        return repository.findById(gameId).orElseThrow(() -> new BusinessException("Game not found"));
-    }
 }
