@@ -67,11 +67,19 @@ public class CardsGameService {
 
     @Transactional
     public Game disconnectFromGame(Player player) {
-        Long gameId = playerRepository.getGameIdByUsername(player.getUsername());
-        Game game = repository.findById(gameId).orElseThrow(() -> new BusinessException("Game not found"));
+        if (player.getUsername() == null) {
+            throw new BusinessException("Null username");
+        }
+
+        Long gameId = playerRepository.getGameIdByUsername(player.getUsername())
+                .orElseThrow(() -> new BusinessException("Game id not found"));
+
+        Game game = repository.findById(gameId)
+                .orElseThrow(() -> new BusinessException("Game not found"));
 
         game.getPlayers().removeIf(p -> p.getUsername().equals(player.getUsername()));
         repository.save(game);
+        playerRepository.deleteByUsername(player.getUsername());
         return game;
     }
 
