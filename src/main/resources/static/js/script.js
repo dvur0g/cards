@@ -26,7 +26,12 @@ function updateGameState(state) {
 }
 
 function updateCardHolders(players) {
-    const cards = players.find(p => p.username === username).cards;
+    let player = players.find(p => p.username === (username));
+    console.log("player === " + player);
+
+    players.forEach(p => {console.log(p.username + " === " + username)});
+
+    let cards = player.cards;
 
     let i = 0;
 
@@ -60,7 +65,7 @@ function updateCurrentUsername() {
     }
 
     username = usernameValue;
-    get("currentUsername").innerHTML = usernameValue;
+    get("currentUsername").innerHTML = username;
     return true;
 }
 
@@ -100,8 +105,12 @@ function visible(elementId) {
     get(elementId).style.visibility = "visible";
 }
 
-function clear(elementId) {
+function clearUsername() {
     username = null;
+    clear("currentUsername");
+}
+
+function clear(elementId) {
     get(elementId).innerHTML = "";
 }
 

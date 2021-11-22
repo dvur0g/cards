@@ -13,7 +13,6 @@ function connectToSocket(game) {
     stompClient.connect({}, function (frame) {
         console.log("connected to the frame: " + frame);
         stompClient.subscribe("/topic/game-progress/" + game.id, function (response) {
-            console.log("SUBSCRIBED")
             let data = JSON.parse(response.body);
             update(data);
         })
@@ -37,7 +36,7 @@ function disconnectFromGame() {
     });
     stompClient.disconnect();
 
-    clear("currentUsername");
+    clearUsername();
 }
 
 function createGame() {

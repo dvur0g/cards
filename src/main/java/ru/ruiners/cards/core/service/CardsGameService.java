@@ -78,7 +78,7 @@ public class CardsGameService {
                 .orElseThrow(() -> new BusinessException("Game not found"));
 
         game.getPlayers().removeIf(p -> p.getUsername().equals(player.getUsername()));
-        repository.save(game);
+        game = repository.save(game);
         playerRepository.deleteByUsername(player.getUsername());
         return game;
     }

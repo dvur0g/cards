@@ -29,7 +29,7 @@ public class GameController {
 
     private final SimpMessagingTemplate simpMessagingTemplate;
 
-    private static final int MIN_PLAYERS_AMOUNT = 2;
+    private static final int MIN_PLAYERS_AMOUNT = 3;
     private static final String TOPIC = "/topic/game-progress/";
 
     @PostMapping("/create")
