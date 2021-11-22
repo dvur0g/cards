@@ -1,4 +1,4 @@
-package ru.ruiners.cards.mapper;
+package ru.ruiners.cards.core.mapper;
 
 import org.mapstruct.Mapper;
 import ru.ruiners.cards.controller.dto.CardDto;

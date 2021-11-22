@@ -10,8 +10,8 @@ import ru.ruiners.cards.controller.dto.GameDto;
 import ru.ruiners.cards.core.model.Game;
 import ru.ruiners.cards.controller.dto.GamePlayDto;
 import ru.ruiners.cards.core.service.CardsGameService;
-import ru.ruiners.cards.mapper.GameMapper;
-import ru.ruiners.cards.mapper.PlayerMapper;
+import ru.ruiners.cards.core.mapper.GameMapper;
+import ru.ruiners.cards.core.mapper.PlayerMapper;
 import ru.ruiners.cards.controller.dto.PlayerDto;
 
 import java.util.List;
