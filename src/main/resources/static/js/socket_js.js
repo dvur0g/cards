@@ -21,6 +21,7 @@ function connectToSocket(game) {
 
     get("menu").style.visibility = "hidden";
     update(game);
+    updateCurrentUsername(username);
 }
 
 function disconnectFromGame() {
@@ -36,6 +37,8 @@ function disconnectFromGame() {
         })
     });
     stompClient.disconnect();
+
+    clear("currentUsername");
 }
 
 function createGame() {

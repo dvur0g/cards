@@ -41,7 +41,7 @@ function updateCardHolders(players) {
 
     for (; i < 10; ++i) {
         hide("cardHolder" + i);
-        get("cardHolder" + i + "id").innerHTML = "";
+        clear("cardHolder" + i + "id");
     }
 }
 
@@ -49,6 +49,10 @@ function updateCurrentPlayer(player) {
     if (!!player) {
         get("currentPlayer").innerHTML = player.username;
     }
+}
+
+function updateCurrentUsername(username) {
+    get("currentUsername").innerHTML = username;
 }
 
 function showAvailableGamesList(games) {
@@ -65,7 +69,7 @@ function showAvailableGamesList(games) {
         list.appendChild(item);
     }
 
-    get('gamesList').innerHTML = '';
+    clear('gamesList');
     get('gamesList').appendChild(list);
 }
 
@@ -85,6 +89,11 @@ function hide(elementId) {
 
 function visible(elementId) {
     get(elementId).style.visibility = "visible";
+}
+
+function clear(elementId) {
+    username = null;
+    get(elementId).innerHTML = "";
 }
 
 function get(elementId) {
