@@ -44,7 +44,7 @@ function disconnectFromGame() {
 }
 
 function createGame() {
-    if (!updateCurrentUsername()) {
+    if (!updateCurrentCredentials()) {
         return;
     }
 
@@ -71,12 +71,7 @@ function createGame() {
 }
 
 function connectToGame(gameId) {
-    if (gameId == null || gameId === '') {
-        alert("Please enter game id");
-        return;
-    }
-
-    if (!updateCurrentUsername()) {
+    if (!updateCurrentCredentials()) {
         return;
     }
 
@@ -104,6 +99,11 @@ function connectToGame(gameId) {
 }
 
 function getAvailableGames() {
+    if (!updateCurrentCredentials()) {
+        return;
+    }
+
+    console.log("start");
     $.ajax({
         url: url + "/game/list",
         headers: {

@@ -26,15 +26,9 @@ function updateGameState(state) {
 }
 
 function updateCardHolders(players) {
-    let player = players.find(p => p.username === (username));
-    console.log("player === " + player);
-
-    players.forEach(p => {console.log(p.username + " === " + username)});
-
-    let cards = player.cards;
+    let cards = players.find(p => p.username === (username)).cards;
 
     let i = 0;
-
     if (!!cards) {
         for (; i < cards.length; ++i) {
             visible("cardHolder" + i);
@@ -56,16 +50,19 @@ function updateCurrentPlayer(player) {
     }
 }
 
-function updateCurrentUsername() {
+function updateCurrentCredentials() {
     let usernameValue = get("username").value;
+    let passwordValue = get("password").value;
 
-    if (usernameValue == null || usernameValue === '') {
-        alert("Please enter username");
+    if (isEmpty(usernameValue, "Please enter username")) {
+        return false;
+    }
+    if (isEmpty(passwordValue, "Please enter password")) {
         return false;
     }
 
     username = usernameValue;
-    password = get("password").value;
+    password = passwordValue;
 
     get("currentUsername").innerHTML = username;
     return true;
@@ -112,6 +109,15 @@ function clearUsername() {
     password = null;
     clear("currentUsername");
     clear("password");
+}
+
+function isEmpty(value, message) {
+    if (value === null || value === "") {
+        alert(message);
+        return true;
+    } else {
+        return false;
+    }
 }
 
 function clear(elementId) {
