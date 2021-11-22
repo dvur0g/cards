@@ -8,4 +8,5 @@ import ru.ruiners.cards.controller.dto.PlayerDto;
 public interface PlayerMapper {
 
     Player toPlayer(PlayerDto request);
+
 }

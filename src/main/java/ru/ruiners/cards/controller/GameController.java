@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.ruiners.cards.controller.dto.ConnectDto;
 import ru.ruiners.cards.controller.dto.GameDto;
 import ru.ruiners.cards.core.model.Game;
-import ru.ruiners.cards.core.model.GamePlay;
+import ru.ruiners.cards.controller.dto.GamePlayDto;
 import ru.ruiners.cards.core.service.CardsGameService;
 import ru.ruiners.cards.mapper.GameMapper;
 import ru.ruiners.cards.mapper.PlayerMapper;
@@ -56,15 +56,6 @@ public class GameController {
         simpMessagingTemplate.convertAndSend(TOPIC + game.getId(), game);
     }
 
-    @PostMapping("/connect/random")
-    public ResponseEntity<GameDto> connectRandom(@RequestBody PlayerDto player) {
-        log.info("connect random {}", player);
-        GameDto game = gameMapper.toDto(gameService.connectToRandomGame(playerMapper.toPlayer(player)));
-        simpMessagingTemplate.convertAndSend(TOPIC + game.getId(), game);
-
-        return ResponseEntity.ok(game);
-    }
-
     @GetMapping("/list")
     public ResponseEntity<List<GameDto>> getAvailableGamesList() {
         List<Game> availableGamesList = gameService.getGamesToConnect();
@@ -75,7 +66,7 @@ public class GameController {
     }
 
     @PostMapping("/gameplay")
-    public ResponseEntity<GameDto> gamePlay(@RequestBody GamePlay request) {
+    public ResponseEntity<GameDto> gamePlay(@RequestBody GamePlayDto request) {
         log.info("gameplay: {}", request);
         GameDto gameDto = gameMapper.toDto(gameService.gamePlay(request));
 

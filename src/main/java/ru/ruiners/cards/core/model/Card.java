@@ -24,4 +24,8 @@ public class Card {
     @Column(nullable = false)
     private CensorType type = CensorType.OK;
 
+    @Override
+    public String toString() {
+        return "id=" + id + ", " + text;
+    }
 }

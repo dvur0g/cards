@@ -15,12 +15,12 @@ function connectToSocket(game) {
         stompClient.subscribe("/topic/game-progress/" + game.id, function (response) {
             console.log("SUBSCRIBED")
             let data = JSON.parse(response.body);
-            showResponse(data);
+            update(data);
         })
     })
 
     get("menu").style.visibility = "hidden";
-    showResponse(game);
+    update(game);
 }
 
 function disconnectFromGame() {
@@ -60,33 +60,6 @@ function createGame() {
             connectToSocket(game);
             alert("Your created a game. Game id is: " + game.id);
             },
-        error: function (error) {
-            console.log(error);
-        }
-    })
-}
-
-
-function connectToRandom() {
-    let usernameValue = get("username").value;
-
-    if (usernameValue == null || usernameValue === '') {
-        alert("Please enter username");
-        return;
-    }
-    
-    username = usernameValue;
-    $.ajax({
-        url: url + "/game/connect/random",
-        type: 'POST',
-        dataType: "json",
-        contentType: "application/json",
-        data: JSON.stringify({
-            "username": username
-        }),
-        success: function (game) {
-            connectToSocket(game);
-            }, 
         error: function (error) {
             console.log(error);
         }

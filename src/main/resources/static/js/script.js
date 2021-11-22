@@ -22,8 +22,8 @@ function makeAMove(type, xCoordinate, yCoordinate) {
             "coordinateY": yCoordinate,
             "gameId": gameId
         }),
-        success: function (data) {
-            showResponse(data);
+        success: function (game) {
+            update(game);
         },
         error: function (error) {
             console.log(error);
@@ -31,9 +31,10 @@ function makeAMove(type, xCoordinate, yCoordinate) {
     })
 }
 
-function showResponse(game) {
+function update(game) {
     updatePlayersList(game.players);
     updateGameState(game.state);
+    updateCardHolders(game.players);
     if (game.state === "IN_PROGRESS") {
 
     } else {
@@ -54,10 +55,31 @@ function updateGameState(state) {
     get("gameState").innerHTML = state;
 }
 
+function updateCardHolders(players) {
+    const cards = players.find(p => p.username === username).cards;
+
+    let i = 0;
+
+    if (!!cards) {
+        for (; i < cards.length; ++i) {
+            let element = get("cardHolder" + i);
+            element.style.visibility = "visible";
+            element.innerHTML = cards[i].text;
+
+            console.log(Object.getOwnPropertyNames(cards[i]));
+            console.log("card " + i + ": [" + cards[i].id + ", " + cards[i].text + ", " + cards[i].type + "]");
+        }
+    }
+
+    for (; i < 10; ++i) {
+        get("cardHolder" + i).style.visibility = "hidden";
+    }
+}
+
 function showAvailableGamesList(games) {
     const list = document.createElement('ul');
 
-    for (let i = 0; i < games.length; i++) {
+    for (let i = 0; i < games.length; ++i) {
         const item = document.createElement('li');
 
         item.appendChild(document.createTextNode(games[i].id + ", " + games[i].state));

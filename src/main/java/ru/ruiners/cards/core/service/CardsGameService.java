@@ -3,6 +3,7 @@ package ru.ruiners.cards.core.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.ruiners.cards.common.BusinessException;
+import ru.ruiners.cards.controller.dto.GamePlayDto;
 import ru.ruiners.cards.core.model.*;
 import ru.ruiners.cards.core.model.enums.GameState;
 import ru.ruiners.cards.core.repository.CardRepository;
@@ -47,21 +48,9 @@ public class CardsGameService {
     }
 
     @Transactional
-    public Game connectToRandomGame(Player player) {
-        List<Game> gamesToConnect = getGamesToConnect();
-        if (gamesToConnect.size() == 0) {
-            throw new BusinessException("No games to connect to");
-        }
-        return connectToGame(player, gamesToConnect.get(random.nextInt(gamesToConnect.size())).getId());
-    }
-
-    @Transactional
     public Game connectToGame(Player player, Long gameId) {
         var game = getGameById(gameId);
 
-//        if (!game.getState().equals(GameState.CREATED)) {
-//            throw new BusinessException("Invalid game state");
-//        }
         if (game.getPlayers().size() > MAX_PLAYERS_AMOUNT) {
             throw new BusinessException("Max players amount reached");
         }
@@ -96,7 +85,7 @@ public class CardsGameService {
         repository.save(game);
     }
 
-    public Game gamePlay(GamePlay gamePlay) {
+    public Game gamePlay(GamePlayDto gamePlay) {
         Game game = repository.findById(gamePlay.getGameId()).orElseThrow(
                 () -> new BusinessException("Game not found")
         );

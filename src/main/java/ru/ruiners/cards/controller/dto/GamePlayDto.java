@@ -1,9 +1,9 @@
-package ru.ruiners.cards.core.model;
+package ru.ruiners.cards.controller.dto;
 
 import lombok.Data;
 
 @Data
-public class GamePlay {
+public class GamePlayDto {
 
     private Long gameId;
     private String username;
