@@ -18,7 +18,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class AuthorizationInterceptor implements HandlerInterceptor {
 
-    private static final Set<String> excludeEndpoints = Set.of("/gameplay.html", "/css/style.css", "/js/socket_js.js", "/js/script.js");
+    private static final Set<String> excludeEndpoints = Set.of("/gameplay.html", "/css/style.css", "/js/socket_js.js", "/js/script.js", "/favicon.ico");
 
     private final AuthorizationService authorizationService;
     private final ObjectMapper objectMapper = new ObjectMapper();
