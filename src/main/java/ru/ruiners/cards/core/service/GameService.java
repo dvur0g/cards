@@ -53,7 +53,7 @@ public class GameService {
         game.setState(GameState.CREATED);
         game.setMinPlayersAmount(minPlayersAmount);
 
-        Player player = preparePlayer(username);
+        Player player = preparePlayer(username, game);
         game.setPlayers(List.of(player));
 
         game = repository.save(game);
@@ -68,7 +68,7 @@ public class GameService {
             throw new BusinessException("Max players amount reached");
         }
 
-        Player player = preparePlayer(username);
+        Player player = preparePlayer(username, game);
         game.getPlayers().add(player);
 
         if (game.getPlayers().size() >= game.getMinPlayersAmount()) {
@@ -123,7 +123,7 @@ public class GameService {
         return result;
     }
 
-    private Player preparePlayer(String username) {
+    private Player preparePlayer(String username, Game game) {
         Player player = playerRepository.findByUsername(username)
                 .orElseThrow(() -> new BusinessException("Player not found"));
 
@@ -133,6 +133,10 @@ public class GameService {
                         .removeIf(p -> p.getUsername().equals(username))
                 );
         playerRepository.removeCardsByUsername(username);
+
+        if (game.getState().equals(GameState.IN_PROGRESS)) {
+            player.setCards(getRandomCards());
+        }
 
         player.setScore(0);
         playerRepository.save(player);
