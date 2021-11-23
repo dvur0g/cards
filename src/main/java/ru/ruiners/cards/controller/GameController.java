@@ -19,7 +19,7 @@ public class GameController {
 
     private final GameService gameService;
 
-    private static final int MIN_PLAYERS_AMOUNT = 3;
+    private static final int MIN_PLAYERS_AMOUNT = 2;
 
     @PostMapping("/create")
     public ResponseEntity<GameDto> start(@RequestBody RequestDto request) {

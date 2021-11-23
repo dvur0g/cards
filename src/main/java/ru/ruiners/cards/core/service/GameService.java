@@ -106,7 +106,6 @@ public class GameService {
         game.setCurrentPlayer(game.getPlayers().get(random.nextInt(game.getPlayers().size())));
 
         game.setState(GameState.IN_PROGRESS);
-        repository.save(game);
     }
 
     public GameDto gamePlay(GamePlayDto gamePlay) {
@@ -139,8 +138,7 @@ public class GameService {
         }
 
         player.setScore(0);
-        playerRepository.save(player);
-        return player;
+        return playerRepository.save(player);
     }
 
     public List<GameDto> getGamesToConnect() {
