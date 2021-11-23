@@ -45,7 +45,7 @@ public class GameService {
 
 
     @Transactional
-    public GameDto createGame(Player player, Integer minPlayersAmount) {
+    public GameDto createGame(String username, Integer minPlayersAmount) {
         if (minPlayersAmount > MAX_PLAYERS_AMOUNT || minPlayersAmount < MIN_PLAYERS_AMOUNT) {
             throw new BusinessException("Invalid players amount");
         }
@@ -53,7 +53,7 @@ public class GameService {
         game.setState(GameState.CREATED);
         game.setMinPlayersAmount(minPlayersAmount);
 
-        saveNewPlayer(player);
+        Player player = preparePlayer(username);
         game.setPlayers(List.of(player));
 
         game = repository.save(game);
@@ -61,14 +61,14 @@ public class GameService {
     }
 
     @Transactional
-    public GameDto connectToGame(Player player, Long gameId) {
+    public GameDto connectToGame(String username, Long gameId) {
         var game = getGameById(gameId);
 
         if (game.getPlayers().size() > MAX_PLAYERS_AMOUNT) {
             throw new BusinessException("Max players amount reached");
         }
 
-        saveNewPlayer(player);
+        Player player = preparePlayer(username);
         game.getPlayers().add(player);
 
         if (game.getPlayers().size() >= game.getMinPlayersAmount()) {
@@ -82,18 +82,18 @@ public class GameService {
     }
 
     @Transactional
-    public void disconnectFromGame(Player player) {
-        if (player.getUsername() == null) {
+    public void disconnectFromGame(String username) {
+        if (username == null || username.equals("")) {
             throw new BusinessException("Null username");
         }
 
-        Long gameId = playerRepository.getGameIdByUsername(player.getUsername())
+        Long gameId = playerRepository.getGameIdByUsername(username)
                 .orElseThrow(() -> new BusinessException("Game id not found"));
 
         Game game = repository.findById(gameId)
                 .orElseThrow(() -> new BusinessException("Game not found"));
 
-        game.getPlayers().removeIf(p -> p.getUsername().equals(player.getUsername()));
+        game.getPlayers().removeIf(p -> p.getUsername().equals(username));
 
         GameDto result = mapper.toDto(repository.save(game));
         simpMessagingTemplate.convertAndSend(TOPIC + result.getId(), result);
@@ -123,14 +123,20 @@ public class GameService {
         return result;
     }
 
-    private void saveNewPlayer(Player player) {
-        playerRepository.getGameIdByUsername(player.getUsername())
+    private Player preparePlayer(String username) {
+        Player player = playerRepository.findByUsername(username)
+                .orElseThrow(() -> new BusinessException("Player not found"));
+
+        playerRepository.getGameIdByUsername(username)
                 .ifPresent(gameId -> repository.findById(gameId)
                         .get().getPlayers()
-                        .removeIf(p -> p.getUsername().equals(player.getUsername()))
+                        .removeIf(p -> p.getUsername().equals(username))
                 );
+        playerRepository.removeCardsByUsername(username);
+
         player.setScore(0);
         playerRepository.save(player);
+        return player;
     }
 
     public List<GameDto> getGamesToConnect() {

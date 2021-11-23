@@ -81,9 +81,7 @@ function connectToGame(gameId) {
             "Authorization": auth()
         },
         data: JSON.stringify({
-            "player": {
-                "username": username
-            },
+            "username": username,
             "gameId": gameId
         }),
         success: function (game) {
@@ -100,7 +98,6 @@ function getAvailableGames() {
         return;
     }
 
-    console.log("start");
     $.ajax({
         url: url + "/game/list",
         headers: {

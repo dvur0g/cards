@@ -14,13 +14,13 @@ public class WebConfiguration implements WebMvcConfigurer {
     private final AuthorizationInterceptor authorizationInterceptor;
 
     @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**").allowedOriginPatterns("*").allowCredentials(false).allowedMethods("*");
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(authorizationInterceptor);
     }
 
     @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(authorizationInterceptor);
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**").allowedOriginPatterns("*").allowCredentials(false).allowedMethods("*");
     }
 
 }

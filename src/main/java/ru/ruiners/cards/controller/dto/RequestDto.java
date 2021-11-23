@@ -3,9 +3,9 @@ package ru.ruiners.cards.controller.dto;
 import lombok.Data;
 
 @Data
-public class ConnectDto {
+public class RequestDto {
 
-    private PlayerDto player;
+    private String username;
     private Long gameId;
 
 }

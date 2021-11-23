@@ -4,11 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.ruiners.cards.controller.dto.ConnectDto;
+import ru.ruiners.cards.controller.dto.RequestDto;
 import ru.ruiners.cards.controller.dto.GameDto;
 import ru.ruiners.cards.controller.dto.GamePlayDto;
-import ru.ruiners.cards.controller.dto.PlayerDto;
-import ru.ruiners.cards.core.mapper.PlayerMapper;
 import ru.ruiners.cards.core.service.GameService;
 
 import java.util.List;
@@ -20,30 +18,28 @@ import java.util.List;
 public class GameController {
 
     private final GameService gameService;
-    private final PlayerMapper playerMapper;
 
     private static final int MIN_PLAYERS_AMOUNT = 3;
 
     @PostMapping("/create")
-    public ResponseEntity<GameDto> start(@RequestBody PlayerDto player) {
-        log.info("create game request: {}", player);
-        GameDto game = gameService.createGame(playerMapper.toPlayer(player), MIN_PLAYERS_AMOUNT);
+    public ResponseEntity<GameDto> start(@RequestBody RequestDto request) {
+        log.info("create game request: {}", request);
+        GameDto game = gameService.createGame(request.getUsername(), MIN_PLAYERS_AMOUNT);
         return ResponseEntity.ok(game);
     }
 
     @PostMapping("/connect")
-    public ResponseEntity<GameDto> connect(@RequestBody ConnectDto request) {
+    public ResponseEntity<GameDto> connect(@RequestBody RequestDto request) {
         log.info("connect request: {}", request);
-        GameDto game = gameService.connectToGame(
-                playerMapper.toPlayer(request.getPlayer()), request.getGameId());
+        GameDto game = gameService.connectToGame(request.getUsername(), request.getGameId());
         log.info("send gameDto to all players {}", game);
         return ResponseEntity.ok(game);
     }
 
     @PostMapping("/disconnect")
-    public void disconnect(@RequestBody PlayerDto player) {
-        log.info("disconnect request: {}", player);
-        gameService.disconnectFromGame(playerMapper.toPlayer(player));
+    public void disconnect(@RequestBody RequestDto request) {
+        log.info("disconnect request: {}", request);
+        gameService.disconnectFromGame(request.getUsername());
     }
 
     @GetMapping("/list")
