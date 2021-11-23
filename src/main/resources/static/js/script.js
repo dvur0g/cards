@@ -1,67 +1,135 @@
-let turns = [["#", "#", "#"], ["#", "#", "#"], ["#", "#", "#"]];
-let turn = "";
-let gameOn = false;
 
-function playerTurn(turn, id) {
-    if (gameOn) {
-        let spotTaken = $("#" + id).text();
-        if (spotTaken === "#") {
-            makeAMove(playerType, id.split("_")[0], id.split("_")[1]);
-        }
+function update(game) {
+    updatePlayersList(game.players);
+    updateGameState(game.state);
+    updateCardHolders(game.players);
+    updateCurrentPlayer(game.currentPlayer);
+
+    if (game.state === "IN_PROGRESS") {
+
+    } else {
+
     }
 }
 
-function makeAMove(type, xCoordinate, yCoordinate) {
-    $.ajax({
-        url: url + "/game/gameplay",
-        type: 'POST',
-        dataType: "json",
-        contentType: "application/json",
-        data: JSON.stringify({
-            "type": type,
-            "coordinateX": xCoordinate,
-            "coordinateY": yCoordinate,
-            "gameId": gameId
-        }),
-        success: function (data) {
-            gameOn = false;
-            displayResponse(data);
-        },
-        error: function (error) {
-            console.log(error);
-        }
+function updatePlayersList(players) {
+    let playersListText = "";
+    let i = 0;
+    players.forEach(player => {
+        playersListText += ++i + ". " + player.username + player.score + ", ";
     })
+    get("playersList").innerHTML = playersListText;
 }
 
-function displayResponse(data) {
-    let board = data.board;
-    for (let i = 0; i < board.length; i++) {
-        for (let j = 0; j < board[i].length; j++) {
-            if (board[i][j] === 1) {
-                turns[i][j] = 'X'
-            } else if (board[i][j] === 2) {
-                turns[i][j] = 'O';
-            }
-            let id = i + "_" + j;
-            $("#" + id).text(turns[i][j]);
+function updateGameState(state) {
+    get("gameState").innerHTML = state;
+}
+
+function updateCardHolders(players) {
+    let cards = players.find(p => p.username === (username)).cards;
+
+    let i = 0;
+    if (!!cards) {
+        for (; i < cards.length; ++i) {
+            visible("cardHolder" + i);
+
+            get("cardHolder" + i + "id").innerHTML = cards[i].id;
+            get("cardHolder" + i + "text").innerHTML = cards[i].text;
         }
     }
-    if (data.winner != null) {
-        alert("Winner is " + data.winner);
+
+    for (; i < 10; ++i) {
+        hide("cardHolder" + i);
+        clear("cardHolder" + i + "id");
     }
-    gameOn = true;
 }
 
-$(".tic").click(function () {
-    let slot = $(this).attr('id');
-    playerTurn(turn, slot);
-});
-
-function reset() {
-    turns = [["#", "#", "#"], ["#", "#", "#"], ["#", "#", "#"]];
-    $(".tic").text("#");
+function updateCurrentPlayer(player) {
+    if (!!player) {
+        get("currentPlayer").innerHTML = player.username;
+    }
 }
 
-$("#reset").click(function () {
-    reset();
-});
+function updateCurrentCredentials() {
+    let usernameValue = get("username").value;
+    let passwordValue = get("password").value;
+
+    if (isEmpty(usernameValue, "Please enter username")) {
+        return false;
+    }
+    if (isEmpty(passwordValue, "Please enter password")) {
+        return false;
+    }
+
+    username = usernameValue;
+    password = passwordValue;
+
+    get("currentUsername").innerHTML = username;
+    return true;
+}
+
+function showAvailableGamesList(games) {
+    const list = document.createElement('ul');
+
+    for (let i = 0; i < games.length; ++i) {
+        const item = document.createElement('li');
+
+        let playersList = ""
+        games[i].players.forEach(player => {
+            playersList += player.username + ", ";
+        })
+        playersList = playersList.slice(0, -2)
+
+        item.appendChild(document.createTextNode(games[i].id + " | " + games[i].state + " | [" + playersList + "]"));
+        item.onclick = function() {
+            connectToGame(games[i].id)
+        };
+
+        list.appendChild(item);
+    }
+
+    clear('gamesList');
+    get('gamesList').appendChild(list);
+}
+
+function selectCard(cardHolderIndex) {
+
+
+    hide("cardHolder" + cardHolderIndex);
+}
+
+function showMenu() {
+    get("menu").style.visibility = "visible";
+}
+
+function hide(elementId) {
+    get(elementId).style.visibility = "hidden";
+}
+
+function visible(elementId) {
+    get(elementId).style.visibility = "visible";
+}
+
+function clearUsername() {
+    username = null;
+    password = null;
+    clear("currentUsername");
+    clear("password");
+}
+
+function isEmpty(value, message) {
+    if (value === null || value === "") {
+        alert(message);
+        return true;
+    } else {
+        return false;
+    }
+}
+
+function clear(elementId) {
+    get(elementId).innerHTML = "";
+}
+
+function get(elementId) {
+    return document.getElementById(elementId);
+}

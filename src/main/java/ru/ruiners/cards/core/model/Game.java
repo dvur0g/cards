@@ -21,9 +21,11 @@ public class Game {
     )
     private Long id;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     private List<Player> players;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private GameState state;
 
     @ManyToOne
@@ -36,4 +38,5 @@ public class Game {
 
     @ManyToOne
     private Player winner;
+
 }

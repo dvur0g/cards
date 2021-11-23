@@ -1,21 +1,15 @@
 package ru.ruiners.cards.controller;
 
-import ru.ruiners.cards.controller.dto.ConnectRequest;
-import ru.ruiners.cards.exception.InvalidGameException;
-import ru.ruiners.cards.exception.InvalidParamException;
-import ru.ruiners.cards.exception.NotFoundException;
-import ru.ruiners.cards.model.Game;
-import ru.ruiners.cards.model.GamePlay;
-import ru.ruiners.cards.model.Player;
-import ru.ruiners.cards.service.GameService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import ru.ruiners.cards.controller.dto.RequestDto;
+import ru.ruiners.cards.controller.dto.GameDto;
+import ru.ruiners.cards.controller.dto.GamePlayDto;
+import ru.ruiners.cards.core.service.GameService;
+
+import java.util.List;
 
 @RestController
 @Slf4j
@@ -24,31 +18,39 @@ import org.springframework.web.bind.annotation.RestController;
 public class GameController {
 
     private final GameService gameService;
-    private final SimpMessagingTemplate simpMessagingTemplate;
 
-    @PostMapping("/start")
-    public ResponseEntity<Game> start(@RequestBody Player player) {
-        log.info("start game request: {}", player);
-        return ResponseEntity.ok(gameService.createGame(player));
+    private static final int MIN_PLAYERS_AMOUNT = 2;
+
+    @PostMapping("/create")
+    public ResponseEntity<GameDto> start(@RequestBody RequestDto request) {
+        log.info("create game request: {}", request);
+        GameDto game = gameService.createGame(request.getUsername(), MIN_PLAYERS_AMOUNT);
+        return ResponseEntity.ok(game);
     }
 
     @PostMapping("/connect")
-    public ResponseEntity<Game> connect(@RequestBody ConnectRequest request) throws InvalidParamException, InvalidGameException {
+    public ResponseEntity<GameDto> connect(@RequestBody RequestDto request) {
         log.info("connect request: {}", request);
-        return ResponseEntity.ok(gameService.connectToGame(request.getPlayer(), request.getGameId()));
+        GameDto game = gameService.connectToGame(request.getUsername(), request.getGameId());
+        log.info("send gameDto to all players {}", game);
+        return ResponseEntity.ok(game);
     }
 
-    @PostMapping("/connect/random")
-    public ResponseEntity<Game> connectRandom(@RequestBody Player player) throws NotFoundException {
-        log.info("connect random {}", player);
-        return ResponseEntity.ok(gameService.connectToRandomGame(player));
+    @PostMapping("/disconnect")
+    public void disconnect(@RequestBody RequestDto request) {
+        log.info("disconnect request: {}", request);
+        gameService.disconnectFromGame(request.getUsername());
+    }
+
+    @GetMapping("/list")
+    public ResponseEntity<List<GameDto>> getAvailableGamesList() {
+        return ResponseEntity.ok(gameService.getGamesToConnect());
     }
 
     @PostMapping("/gameplay")
-    public ResponseEntity<Game> gamePlay(@RequestBody GamePlay request) throws NotFoundException, InvalidGameException {
+    public ResponseEntity<GameDto> gamePlay(@RequestBody GamePlayDto request) {
         log.info("gameplay: {}", request);
-        Game game = gameService.gamePlay(request);
-        simpMessagingTemplate.convertAndSend("/topic/game-progress/" + game.getGameId(), game);
-        return ResponseEntity.ok(game);
+        return ResponseEntity.ok(gameService.gamePlay(request));
     }
+
 }

@@ -1,109 +1,121 @@
-const url = 'http://localhost:8081';
+const url = 'http://localhost:8080';
 let stompClient;
-let gameId;
-let playerType;
 
-function connectToSocket(gameId) {
+let username = null;
+let password = null;
 
-    console.log("connecting to the game");
+function connectToSocket(game) {
+    console.log("connecting to the game " + game.id);
+    
     let socket = new SockJS(url + "/gameplay");
     stompClient = Stomp.over(socket);
     stompClient.connect({}, function (frame) {
         console.log("connected to the frame: " + frame);
-        stompClient.subscribe("/topic/game-progress/" + gameId, function (response) {
+        stompClient.subscribe("/topic/game-progress/" + game.id, function (response) {
             let data = JSON.parse(response.body);
-            console.log(data);
-            displayResponse(data);
+            update(data);
         })
+    })
+
+    get("menu").style.visibility = "hidden";
+    update(game);
+}
+
+function disconnectFromGame() {
+    console.log("disconnect from game " + username);
+
+    $.ajax({
+        url: url + "/game/disconnect",
+        type: 'POST',
+        dataType: "json",
+        contentType: "application/json",
+        headers: {
+            "Authorization": auth()
+        },
+        data: JSON.stringify({
+            "username": username
+        })
+    });
+    stompClient.disconnect();
+
+    clearUsername();
+}
+
+function createGame() {
+    if (!updateCurrentCredentials()) {
+        return;
+    }
+
+    $.ajax({
+        url: url + "/game/create",
+        type: 'POST',
+        dataType: "json",
+        contentType: "application/json",
+        headers: {
+            "Authorization": auth()
+        },
+        data: JSON.stringify({
+            "username": username
+        }),
+        success: function (game) {
+            connectToSocket(game);
+            alert("Your created a game. Game id is: " + game.id);
+            },
+        error: function (error) {
+            console.log(error);
+        }
     })
 }
 
-function create_game() {
-    let login = document.getElementById("login").value;
-    if (login == null || login === '') {
-        alert("Please enter login");
-    } else {
-        $.ajax({
-            url: url + "/game/start",
-            type: 'POST',
-            dataType: "json",
-            contentType: "application/json",
-            data: JSON.stringify({
-                "login": login
-            }),
-            success: function (data) {
-                gameId = data.gameId;
-                playerType = 'X';
-                reset();
-                connectToSocket(gameId);
-                alert("Your created a game. Game id is: " + data.gameId);
-                gameOn = true;
-            },
-            error: function (error) {
-                console.log(error);
-            }
-        })
+function connectToGame(gameId) {
+    if (!updateCurrentCredentials()) {
+        return;
     }
-}
 
-
-function connectToRandom() {
-    let login = document.getElementById("login").value;
-    if (login == null || login === '') {
-        alert("Please enter login");
-    } else {
-        $.ajax({
-            url: url + "/game/connect/random",
-            type: 'POST',
-            dataType: "json",
-            contentType: "application/json",
-            data: JSON.stringify({
-                "login": login
-            }),
-            success: function (data) {
-                gameId = data.gameId;
-                playerType = 'O';
-                reset();
-                connectToSocket(gameId);
-                alert("Congrats you're playing with: " + data.player1.login);
+    $.ajax({
+        url: url + "/game/connect",
+        type: 'POST',
+        dataType: "json",
+        contentType: "application/json",
+        headers: {
+            "Authorization": auth()
+        },
+        data: JSON.stringify({
+            "username": username,
+            "gameId": gameId
+        }),
+        success: function (game) {
+            connectToSocket(game);
             },
-            error: function (error) {
-                console.log(error);
-            }
-        })
-    }
-}
-
-function connectToSpecificGame() {
-    let login = document.getElementById("login").value;
-    if (login == null || login === '') {
-        alert("Please enter login");
-    } else {
-        let gameId = document.getElementById("game_id").value;
-        if (gameId == null || gameId === '') {
-            alert("Please enter game id");
+        error: function (error) {
+            console.log(error);
         }
-        $.ajax({
-            url: url + "/game/connect",
-            type: 'POST',
-            dataType: "json",
-            contentType: "application/json",
-            data: JSON.stringify({
-                "player": {
-                    "login": login
-                },
-                "gameId": gameId
-            }),
-            success: function (data) {
-                gameId = data.gameId;
-                playerType = 'O';
-                reset();
-                connectToSocket(gameId);
-                alert("Congrats you're playing with: " + data.player1.login);
-            },
-            error: function (error) {
-                console.log(error);
-            }
-        })
+    })
+}
+
+function getAvailableGames() {
+    if (!updateCurrentCredentials()) {
+        return;
     }
+
+    $.ajax({
+        url: url + "/game/list",
+        headers: {
+            "Authorization": auth()
+        },
+        type: 'GET',
+        success: function (gamesList) {
+            showAvailableGamesList(gamesList)
+        },
+        error: function (error) {
+            console.log(error);
+        }
+    })
+}
+
+function auth() {
+    return JSON.stringify({
+        "username": username,
+        "password": password
+    });
 }

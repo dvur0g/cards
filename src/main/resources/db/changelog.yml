@@ -8,3 +8,21 @@ databaseChangeLog:
             path: sql/001-init.sql
             relativeToChangelogFile: true
             splitStatements: true
+  - changeSet:
+      id: 002-clear-database
+      author: dvur0g
+      changes:
+        - sqlFile:
+            encoding: UTF-8
+            path: sql/002-clear-database.sql
+            relativeToChangelogFile: true
+            splitStatements: true
+  - changeSet:
+      id: 003-init-cards-and-questions
+      author: dvur0g
+      changes:
+        - sqlFile:
+            encoding: UTF-8
+            path: sql/003-init-cards-and-questions.sql
+            relativeToChangelogFile: true
+            splitStatements: true
