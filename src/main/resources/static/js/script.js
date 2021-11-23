@@ -74,7 +74,13 @@ function showAvailableGamesList(games) {
     for (let i = 0; i < games.length; ++i) {
         const item = document.createElement('li');
 
-        item.appendChild(document.createTextNode(games[i].id + ", " + games[i].state));
+        let playersList = ""
+        games[i].players.forEach(player => {
+            playersList += player.username + ", ";
+        })
+        playersList = playersList.slice(0, -2)
+
+        item.appendChild(document.createTextNode(games[i].id + " | " + games[i].state + " | [" + playersList + "]"));
         item.onclick = function() {
             connectToGame(games[i].id)
         };

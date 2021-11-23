@@ -18,7 +18,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class AuthorizationInterceptor implements HandlerInterceptor {
 
-    private static final Set<String> excludeEndpoints = Set.of("/gameplay.html", "/css/style.css", "/js/socket_js.js", "/js/script.js");
+    private static final Set<String> excludeEndpoints = Set.of("/gameplay.html", "/css/style.css", "/js/socket_js.js", "/js/script.js", "/favicon.ico");
 
     private final AuthorizationService authorizationService;
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -26,8 +26,8 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
             throws JsonProcessingException {
-
-        if (!excludeEndpoints.contains(request.getRequestURI())) {
+        String uri = request.getRequestURI();
+        if (!excludeEndpoints.contains(uri)) {
             String authorizationString = request.getHeader("Authorization");
             AuthenticateDto authorization = objectMapper.readValue(authorizationString, AuthenticateDto.class);
             return authorizationService.authenticate(authorization);
