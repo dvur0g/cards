@@ -11,20 +11,29 @@ import ru.ruiners.cards.security.AuthorizationService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Set;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class AuthorizationInterceptor implements HandlerInterceptor {
 
+    private static final Set<String> excludeEndpoints = Set.of("/gameplay.html", "/css/style.css", "/js/socket_js.js", "/js/script.js");
+
     private final AuthorizationService authorizationService;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws JsonProcessingException {
-        String authorizationString = request.getHeader("Authorization");
-        AuthenticateDto authorization = objectMapper.readValue(authorizationString, AuthenticateDto.class);
-        return authorizationService.authenticate(authorization);
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
+            throws JsonProcessingException {
+
+        if (!excludeEndpoints.contains(request.getRequestURI())) {
+            String authorizationString = request.getHeader("Authorization");
+            AuthenticateDto authorization = objectMapper.readValue(authorizationString, AuthenticateDto.class);
+            return authorizationService.authenticate(authorization);
+        }
+
+        return true;
     }
 
 }
