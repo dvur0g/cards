@@ -4,6 +4,7 @@ function update(game) {
     updateGameState(game.state);
     updateCardHolders(game.players);
     updateCurrentPlayer(game.currentPlayer);
+    updateQuestion(game.currentQuestion);
 
     if (game.state === "IN_PROGRESS") {
 
@@ -66,6 +67,10 @@ function updateCurrentCredentials() {
 
     get("currentUsername").innerHTML = username;
     return true;
+}
+
+function updateQuestion(question) {
+    get("question").innerHTML = question.text;
 }
 
 function showAvailableGamesList(games) {

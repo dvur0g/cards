@@ -6,8 +6,8 @@ import ru.ruiners.cards.core.model.enums.GameState;
 import javax.persistence.*;
 import java.util.List;
 
-@Data
 @Entity
+@Data
 public class Game {
 
     @Id
