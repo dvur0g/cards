@@ -70,7 +70,9 @@ function updateCurrentCredentials() {
 }
 
 function updateQuestion(question) {
-    get("question").innerHTML = question.text;
+    if (!!question) {
+        get("question").innerHTML = question.text;
+    }
 }
 
 function showAvailableGamesList(games) {

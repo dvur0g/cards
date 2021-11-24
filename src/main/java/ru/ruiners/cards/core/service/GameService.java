@@ -1,6 +1,7 @@
 package ru.ruiners.cards.core.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import ru.ruiners.cards.common.BusinessException;
@@ -20,8 +21,13 @@ import ru.ruiners.cards.core.repository.QuestionRepository;
 import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class GameService {
@@ -31,6 +37,8 @@ public class GameService {
     private static final int STARTING_CARDS_AMOUNT = 10;
 
     private static final String TOPIC = "/topic/game-progress/";
+    private static final Set<GameState> playingGameStates = Set.of(GameState.CREATED,
+            GameState.PROCESSING, GameState.SELECTING_ANSWERS, GameState.SHOW_VICTORIOUS_ANSWER);
 
     private final GameRepository repository;
     private final CardRepository cardRepository;
@@ -42,7 +50,7 @@ public class GameService {
     private final GameMapper mapper;
 
     private final Random random = new Random();
-
+    private final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
     @Transactional
     public GameDto createGame(String username, Integer minPlayersAmount) {
@@ -99,15 +107,6 @@ public class GameService {
         simpMessagingTemplate.convertAndSend(TOPIC + result.getId(), result);
     }
 
-    private void startGame(Game game) {
-        game.getPlayers().forEach(player -> player.setCards(getRandomCards()));
-
-        game.setCurrentQuestion(getRandomQuestion());
-        game.setCurrentPlayer(game.getPlayers().get(random.nextInt(game.getPlayers().size())));
-
-        game.setState(GameState.IN_PROGRESS);
-    }
-
     public GameDto gamePlay(GamePlayDto gamePlay) {
         Game game = repository.findById(gamePlay.getGameId()).orElseThrow(
                 () -> new BusinessException("Game not found")
@@ -122,6 +121,44 @@ public class GameService {
         return result;
     }
 
+    public List<GameDto> getGamesToConnect() {
+        return repository.findAllByStateIn(playingGameStates)
+                .stream().map(mapper::toDto).collect(Collectors.toList());
+    }
+
+    private void startGame(Game game) {
+        game.getPlayers().forEach(player -> player.setCards(getRandomCards()));
+
+        game.setState(GameState.PROCESSING);
+        executor.schedule(() -> setSelectingAnswersState(game), 5, TimeUnit.SECONDS);
+    }
+
+    private void setSelectingAnswersState(Game game) {
+        log.info("set SELECTING_ANSWERS state for game {}", game.getId());
+
+        game.setCurrentQuestion(getRandomQuestion());
+        game.setCurrentPlayer(game.getPlayers().get(random.nextInt(game.getPlayers().size())));
+        game.setState(GameState.SELECTING_ANSWERS);
+        repository.save(game);
+
+        GameDto result = mapper.toDto(game);
+        simpMessagingTemplate.convertAndSend(TOPIC + result.getId(), result);
+
+        executor.schedule(() -> setProcessingState(game), 20, TimeUnit.SECONDS);
+    }
+
+    private void setProcessingState(Game game) {
+        log.info("set PROCESSING state for game {}", game.getId());
+
+        game.setState(GameState.PROCESSING);
+        repository.save(game);
+
+        GameDto result = mapper.toDto(game);
+        simpMessagingTemplate.convertAndSend(TOPIC + result.getId(), result);
+
+        executor.schedule(() -> setSelectingAnswersState(game), 5, TimeUnit.SECONDS);
+    }
+
     private Player preparePlayer(String username, Game game) {
         Player player = playerRepository.findByUsername(username)
                 .orElseThrow(() -> new BusinessException("Player not found"));
@@ -133,17 +170,12 @@ public class GameService {
                 );
         playerRepository.removeCardsByUsername(username);
 
-        if (game.getState().equals(GameState.IN_PROGRESS)) {
+        if (playingGameStates.contains(game.getState())) {
             player.setCards(getRandomCards());
         }
 
         player.setScore(0);
         return playerRepository.save(player);
-    }
-
-    public List<GameDto> getGamesToConnect() {
-        return repository.findAllByStateIn(List.of(GameState.CREATED, GameState.IN_PROGRESS))
-                .stream().map(mapper::toDto).collect(Collectors.toList());
     }
 
     private Game getGameById(Long gameId) {
