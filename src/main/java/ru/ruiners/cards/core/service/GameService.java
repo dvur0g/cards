@@ -135,8 +135,7 @@ public class GameService {
     private void setProcessingState(Game game) {
         log.info("set PROCESSING state for game {}", game.getId());
 
-        if (game.getWinnerOptional().isPresent()) {
-            setFinishedState(game);
+        if (isFinishedState(game)) {
             return;
         }
 
@@ -188,7 +187,11 @@ public class GameService {
         executor.schedule(() -> setProcessingState(game), 10, TimeUnit.SECONDS);
     }
 
-    private void setFinishedState(Game game) {
+    private boolean isFinishedState(Game game) {
+        if (game.getWinnerOptional().isEmpty()) {
+            return false;
+        }
+
         log.info("set FINISHED state for game {}", game.getId());
 
         game.setWinner(game.getWinnerOptional().get());
@@ -196,6 +199,8 @@ public class GameService {
 
         GameDto result = mapper.toDto(game);
         simpMessagingTemplate.convertAndSend(TOPIC + result.getId(), result);
+
+        return true;
     }
 
     private Player preparePlayer(String username, Game game) {
