@@ -13,6 +13,8 @@ import java.util.List;
 @Where(clause = "deleted = false")
 public class Player {
 
+    private static final int MAX_SCORE = 10;
+
     @Id
     @GeneratedValue(
             strategy = GenerationType.SEQUENCE,
@@ -34,6 +36,21 @@ public class Player {
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<Card> cards;
 
+    @ManyToOne
+    private Card selectedAnswer;
+
     private boolean deleted = false;
+
+    public void incrementScore() {
+        ++score;
+    }
+
+    public void removeSelectedAnswer() {
+        selectedAnswer = null;
+    }
+
+    public boolean isWinner() {
+        return score == MAX_SCORE;
+    }
 
 }

@@ -5,6 +5,7 @@ import ru.ruiners.cards.core.model.enums.GameState;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.Optional;
 
 @Entity
 @Data
@@ -29,6 +30,9 @@ public class Game {
     private GameState state;
 
     @ManyToOne
+    private Card victoriousAnswer;
+
+    @ManyToOne
     private Question currentQuestion;
 
     @ManyToOne
@@ -38,5 +42,9 @@ public class Game {
 
     @ManyToOne
     private Player winner;
+
+    public Optional<Player> getWinnerOptional() {
+        return getPlayers().stream().filter(Player::isWinner).findAny();
+    }
 
 }

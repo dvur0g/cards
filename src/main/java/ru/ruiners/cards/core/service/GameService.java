@@ -19,9 +19,7 @@ import ru.ruiners.cards.core.repository.PlayerRepository;
 import ru.ruiners.cards.core.repository.QuestionRepository;
 
 import javax.transaction.Transactional;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -128,8 +126,26 @@ public class GameService {
 
     private void startGame(Game game) {
         game.getPlayers().forEach(player -> player.setCards(getRandomCards()));
+        game.setState(GameState.PROCESSING);
+        repository.save(game);
+
+        executor.schedule(() -> setSelectingAnswersState(game), 5, TimeUnit.SECONDS);
+    }
+
+    private void setProcessingState(Game game) {
+        log.info("set PROCESSING state for game {}", game.getId());
+
+        if (game.getWinnerOptional().isPresent()) {
+            setFinishedState(game);
+            return;
+        }
 
         game.setState(GameState.PROCESSING);
+        repository.save(game);
+
+        GameDto result = mapper.toDto(game);
+        simpMessagingTemplate.convertAndSend(TOPIC + result.getId(), result);
+
         executor.schedule(() -> setSelectingAnswersState(game), 5, TimeUnit.SECONDS);
     }
 
@@ -144,19 +160,42 @@ public class GameService {
         GameDto result = mapper.toDto(game);
         simpMessagingTemplate.convertAndSend(TOPIC + result.getId(), result);
 
-        executor.schedule(() -> setProcessingState(game), 20, TimeUnit.SECONDS);
+        executor.schedule(() -> setShowingVictoriousAnswerState(game), 20, TimeUnit.SECONDS);
     }
 
-    private void setProcessingState(Game game) {
-        log.info("set PROCESSING state for game {}", game.getId());
+    private void setShowingVictoriousAnswerState(Game game) {
+        log.info("set SHOWING_VICTORIOUS_ANSWER state for game {}", game.getId());
 
-        game.setState(GameState.PROCESSING);
+        if (game.getState().equals(GameState.SHOW_VICTORIOUS_ANSWER)) {
+            return;
+        }
+
+        Optional<Player> victoriousPlayer = game.getPlayers().stream()
+                .filter(player -> player.getSelectedAnswer() != null)
+                .findAny();
+
+        if (victoriousPlayer.isPresent()) {
+            game.setVictoriousAnswer(victoriousPlayer.get().getSelectedAnswer());
+            victoriousPlayer.get().setSelectedAnswer(null);
+        }
+        game.setState(GameState.SHOW_VICTORIOUS_ANSWER);
+        game.getPlayers().forEach(Player::removeSelectedAnswer);
         repository.save(game);
 
         GameDto result = mapper.toDto(game);
         simpMessagingTemplate.convertAndSend(TOPIC + result.getId(), result);
 
-        executor.schedule(() -> setSelectingAnswersState(game), 5, TimeUnit.SECONDS);
+        executor.schedule(() -> setProcessingState(game), 10, TimeUnit.SECONDS);
+    }
+
+    private void setFinishedState(Game game) {
+        log.info("set FINISHED state for game {}", game.getId());
+
+        game.setWinner(game.getWinnerOptional().get());
+        game.setState(GameState.FINISHED);
+
+        GameDto result = mapper.toDto(game);
+        simpMessagingTemplate.convertAndSend(TOPIC + result.getId(), result);
     }
 
     private Player preparePlayer(String username, Game game) {
