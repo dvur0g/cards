@@ -78,7 +78,14 @@ public class GameService {
         game.getPlayers().add(player);
 
         if (game.getPlayers().size() >= game.getMinPlayersAmount()) {
-            startGame(game);
+            //start game
+            game.getPlayers().forEach(p -> {
+                List<Card> cards = getRandomCards();
+                p.setCards(cards);
+            });
+            game.setState(GameState.PROCESSING);
+
+            executor.schedule(() -> setSelectingAnswersState(game), 5, TimeUnit.SECONDS);
         }
         repository.save(game);
 
@@ -122,14 +129,6 @@ public class GameService {
     public List<GameDto> getGamesToConnect() {
         return repository.findAllByStateIn(playingGameStates)
                 .stream().map(mapper::toDto).collect(Collectors.toList());
-    }
-
-    private void startGame(Game game) {
-        game.getPlayers().forEach(player -> player.setCards(getRandomCards()));
-        game.setState(GameState.PROCESSING);
-        repository.save(game);
-
-        executor.schedule(() -> setSelectingAnswersState(game), 5, TimeUnit.SECONDS);
     }
 
     private void setProcessingState(Game game) {

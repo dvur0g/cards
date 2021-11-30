@@ -9,7 +9,7 @@ function connectToSocket(game) {
     
     let socket = new SockJS(url + "/gameplay");
     stompClient = Stomp.over(socket);
-    stompClient.connect({}, function (frame) {
+    stompClient.connect({"Authorization":auth()}, function (frame) {
         console.log("connected to the frame: " + frame);
         stompClient.subscribe("/topic/game-progress/" + game.id, function (response) {
             let data = JSON.parse(response.body);
