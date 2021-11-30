@@ -18,7 +18,7 @@ function updatePlayersList(players) {
     let playersListText = "";
     let i = 0;
     players.forEach(player => {
-        playersListText += ++i + ". " + player.username + player.score + ", ";
+        playersListText += ++i + ". " + player.username + " | " + player.score + ",\ ";
     })
     get("playersList").innerHTML = playersListText;
 }
@@ -54,6 +54,7 @@ function updateSelectedAnswers(players) {
         if (!!selectedAnswer) {
             get("cardSelected" + i + "id").innerHTML = selectedAnswer.id;
             get("cardSelected" + i + "text").innerHTML = selectedAnswer.text;
+            get("cardSelected" + i + "userId").innerHTML = player.id;
             visible("cardSelected" + i);
             ++i;
         }
@@ -124,6 +125,14 @@ function selectCard(cardHolderIndex) {
 
     if (!!cardId) {
         postSelectCard(cardId)
+    }
+}
+
+function selectAnswer(cardSelectedIndex) {
+    let victoriousPlayerId = get("cardSelected" + cardSelectedIndex + "userId").innerHTML;
+
+    if (!!victoriousPlayerId) {
+        postSelectAnswer(victoriousPlayerId)
     }
 }
 

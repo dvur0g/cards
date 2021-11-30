@@ -135,6 +135,26 @@ function postSelectCard(cardId) {
     })
 }
 
+function postSelectAnswer(victoriousPlayerId) {
+    $.ajax({
+        url: url + "/game/select-victorious-answer",
+        type: 'POST',
+        dataType: "json",
+        contentType: "application/json",
+        headers: {
+            "Authorization": auth()
+        },
+        data: JSON.stringify({
+            "victoriousPlayerId": victoriousPlayerId,
+            "gameId": gameId
+        }),
+        error: function (error) {
+            console.log(error);
+        }
+    })
+}
+
+
 function auth() {
     return JSON.stringify({
         "username": username,

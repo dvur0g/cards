@@ -1,15 +1,11 @@
 package ru.ruiners.cards.core.service;
 
-import liquibase.pro.packaged.P;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import ru.ruiners.cards.common.BusinessException;
-import ru.ruiners.cards.controller.dto.AuthorizationDto;
-import ru.ruiners.cards.controller.dto.GameDto;
-import ru.ruiners.cards.controller.dto.GamePlayDto;
-import ru.ruiners.cards.controller.dto.SelectCardDto;
+import ru.ruiners.cards.controller.dto.*;
 import ru.ruiners.cards.core.mapper.GameMapper;
 import ru.ruiners.cards.core.model.Card;
 import ru.ruiners.cards.core.model.Game;
@@ -167,6 +163,35 @@ public class GameService {
     }
 
     @Transactional
+    public void selectVictoriousAnswer(SelectVictoriousAnswerDto selectVictoriousAnswer,
+                                       AuthorizationDto authorizationDto) {
+        Game game = getGameById(selectVictoriousAnswer.getGameId());
+
+        if (!game.getState().equals(GameState.SELECTING_VICTORIOUS_ANSWER)) {
+            throw new BusinessException("Game state is not SELECTING_VICTORIOUS_ANSWER");
+        }
+
+        Player currentPlayer = game.getCurrentPlayer();
+
+        if (currentPlayer == null || !currentPlayer.getUsername().equals(authorizationDto.getUsername())) {
+            throw new BusinessException("Player null or not the host");
+        }
+
+        Player victoriousPlayer = game.getPlayers().stream()
+                .filter(p -> p.getId().equals(selectVictoriousAnswer.getVictoriousPlayerId()))
+                .findAny().orElseThrow(() -> new BusinessException("Victorious player not found"));
+
+        if (victoriousPlayer.getSelectedAnswer() == null) {
+            throw new BusinessException("Victorious player did not select card");
+        }
+
+        game.setVictoriousAnswer(victoriousPlayer.getSelectedAnswer());
+        repository.save(game);
+
+        setShowingVictoriousAnswerState(game.getId());
+    }
+
+    @Transactional
     public void setProcessingState(Long gameId) {
         log.info("set PROCESSING state for game {}", gameId);
 
@@ -176,6 +201,7 @@ public class GameService {
 
         Game game = getGameById(gameId);
         game.setState(GameState.PROCESSING);
+        game.setVictoriousAnswer(null);
         repository.save(game);
 
         GameDto result = mapper.toDto(game);
@@ -197,6 +223,23 @@ public class GameService {
         GameDto result = mapper.toDto(game);
         simpMessagingTemplate.convertAndSend(TOPIC + result.getId(), result);
 
+        executor.schedule(() -> setSelectingVictoriousAnswerState(game.getId()), 20, TimeUnit.SECONDS);
+    }
+
+    @Transactional
+    public void setSelectingVictoriousAnswerState(Long gameId) {
+        log.info("set SELECTING_VICTORIOUS_ANSWER state for game {}", gameId);
+        Game game = getGameById(gameId);
+
+        if (!game.getState().equals(GameState.SELECTING_ANSWERS)) {
+            return;
+        }
+
+        game.setState(GameState.SELECTING_VICTORIOUS_ANSWER);
+
+        GameDto result = mapper.toDto(repository.save(game));
+        simpMessagingTemplate.convertAndSend(TOPIC + result.getId(), result);
+
         executor.schedule(() -> setShowingVictoriousAnswerState(game.getId()), 20, TimeUnit.SECONDS);
     }
 
@@ -205,7 +248,7 @@ public class GameService {
         log.info("set SHOWING_VICTORIOUS_ANSWER state for game {}", gameId);
         Game game = getGameById(gameId);
 
-        if (game.getState().equals(GameState.SHOW_VICTORIOUS_ANSWER)) {
+        if (!game.getState().equals(GameState.SELECTING_VICTORIOUS_ANSWER)) {
             return;
         }
 
@@ -215,7 +258,7 @@ public class GameService {
 
         if (victoriousPlayer.isPresent()) {
             game.setVictoriousAnswer(victoriousPlayer.get().getSelectedAnswer());
-            victoriousPlayer.get().setSelectedAnswer(null);
+            victoriousPlayer.get().incrementScore();
         }
         game.setState(GameState.SHOW_VICTORIOUS_ANSWER);
         game.getPlayers().forEach(Player::removeSelectedAnswer);
@@ -258,6 +301,7 @@ public class GameService {
 
         playerRepository.removeCardsByUsername(player.getUsername());
         player.setCards(null);
+        player.setSelectedAnswer(null);
         player.setScore(0);
         return playerRepository.save(player);
     }

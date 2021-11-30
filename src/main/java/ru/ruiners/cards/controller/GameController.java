@@ -5,10 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.ruiners.cards.controller.dto.RequestDto;
-import ru.ruiners.cards.controller.dto.GameDto;
-import ru.ruiners.cards.controller.dto.GamePlayDto;
-import ru.ruiners.cards.controller.dto.SelectCardDto;
+import ru.ruiners.cards.controller.dto.*;
 import ru.ruiners.cards.core.service.GameService;
 import ru.ruiners.cards.security.AuthorizationService;
 
@@ -59,9 +56,16 @@ public class GameController {
     }
 
     @PostMapping("/select-card")
-    public void selectCard(@RequestBody SelectCardDto requestBody, HttpServletRequest request) throws JsonProcessingException {
-        log.info("select card: {}", requestBody);
-        gameService.selectAnswer(requestBody, authorizationService.getAuthenticateDto(request));
+    public void selectCard(@RequestBody SelectCardDto selectCard, HttpServletRequest request) throws JsonProcessingException {
+        log.info("select card: {}", selectCard);
+        gameService.selectAnswer(selectCard, authorizationService.getAuthenticateDto(request));
+    }
+
+    @PostMapping("/select-victorious-answer")
+    public void selectVictoriousAnswer(@RequestBody SelectVictoriousAnswerDto selectVictoriousAnswer,
+                                       HttpServletRequest request) throws JsonProcessingException {
+        log.info("select victorious answer: {}", selectVictoriousAnswer);
+        gameService.selectVictoriousAnswer(selectVictoriousAnswer, authorizationService.getAuthenticateDto(request));
     }
 
 }
