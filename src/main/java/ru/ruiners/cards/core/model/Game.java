@@ -1,6 +1,8 @@
 package ru.ruiners.cards.core.model;
 
 import lombok.Data;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 import ru.ruiners.cards.core.model.enums.GameState;
 
 import javax.persistence.*;
@@ -22,6 +24,7 @@ public class Game {
     )
     private Long id;
 
+    @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(cascade = CascadeType.ALL)
     private List<Player> players;
 

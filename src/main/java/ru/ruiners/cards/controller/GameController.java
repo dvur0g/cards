@@ -1,5 +1,6 @@
 package ru.ruiners.cards.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -7,8 +8,11 @@ import org.springframework.web.bind.annotation.*;
 import ru.ruiners.cards.controller.dto.RequestDto;
 import ru.ruiners.cards.controller.dto.GameDto;
 import ru.ruiners.cards.controller.dto.GamePlayDto;
+import ru.ruiners.cards.controller.dto.SelectCardDto;
 import ru.ruiners.cards.core.service.GameService;
+import ru.ruiners.cards.security.AuthorizationService;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @RestController
@@ -18,6 +22,7 @@ import java.util.List;
 public class GameController {
 
     private final GameService gameService;
+    private final AuthorizationService authorizationService;
 
     private static final int MIN_PLAYERS_AMOUNT = 2;
 
@@ -51,6 +56,12 @@ public class GameController {
     public ResponseEntity<GameDto> gamePlay(@RequestBody GamePlayDto request) {
         log.info("gameplay: {}", request);
         return ResponseEntity.ok(gameService.gamePlay(request));
+    }
+
+    @PostMapping("/select-card")
+    public void selectCard(@RequestBody SelectCardDto requestBody, HttpServletRequest request) throws JsonProcessingException {
+        log.info("select card: {}", requestBody);
+        gameService.selectAnswer(requestBody, authorizationService.getAuthenticateDto(request));
     }
 
 }

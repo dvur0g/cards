@@ -3,6 +3,7 @@ let stompClient;
 
 let username = null;
 let password = null;
+let gameId = null;
 
 function connectToSocket(game) {
     console.log("connecting to the game " + game.id);
@@ -18,6 +19,8 @@ function connectToSocket(game) {
     })
 
     get("menu").style.visibility = "hidden";
+    gameId = game.id;
+
     update(game);
 }
 
@@ -107,6 +110,25 @@ function getAvailableGames() {
         success: function (gamesList) {
             showAvailableGamesList(gamesList)
         },
+        error: function (error) {
+            console.log(error);
+        }
+    })
+}
+
+function postSelectCard(cardId) {
+    $.ajax({
+        url: url + "/game/select-card",
+        type: 'POST',
+        dataType: "json",
+        contentType: "application/json",
+        headers: {
+            "Authorization": auth()
+        },
+        data: JSON.stringify({
+            "cardId": cardId,
+            "gameId": gameId
+        }),
         error: function (error) {
             console.log(error);
         }
