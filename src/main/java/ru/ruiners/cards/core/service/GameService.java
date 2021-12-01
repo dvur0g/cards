@@ -32,10 +32,15 @@ public class GameService {
     private static final int MIN_PLAYERS_AMOUNT = 2;
     private static final int MAX_PLAYERS_AMOUNT = 10;
     private static final int STARTING_CARDS_AMOUNT = 10;
+    private static final int PROCESSING_DELAY = 10;
+    private static final int SELECTING_ANSWERS_DELAY = 20;
+
 
     private static final String TOPIC = "/topic/game-progress/";
-    private static final Set<GameState> playingGameStates = Set.of(GameState.CREATED,
-            GameState.PROCESSING, GameState.SELECTING_ANSWERS, GameState.SHOW_VICTORIOUS_ANSWER);
+    private static final Set<GameState> playingGameStates = Set.of(
+            GameState.CREATED, GameState.PROCESSING, GameState.SELECTING_ANSWERS,
+            GameState.SELECTING_VICTORIOUS_ANSWER, GameState.SHOW_VICTORIOUS_ANSWER
+    );
 
     private final GameRepository repository;
     private final CardRepository cardRepository;
@@ -58,7 +63,7 @@ public class GameService {
         game.setState(GameState.CREATED);
         game.setMinPlayersAmount(minPlayersAmount);
 
-        Player player = preparePlayer(username, game);
+        Player player = preparePlayer(username);
         game.setPlayers(List.of(player));
 
         game = repository.save(game);
@@ -73,7 +78,11 @@ public class GameService {
             throw new BusinessException("Max players amount reached");
         }
 
-        Player player = preparePlayer(username, game);
+        if (game.getPlayers().stream().anyMatch(p -> p.getUsername().equals(username))) {
+            return mapper.toDto(game);
+        }
+
+        Player player = preparePlayer(username);
         game.getPlayers().add(player);
 
         if (game.getPlayers().size() >= game.getMinPlayersAmount()) {
@@ -81,7 +90,7 @@ public class GameService {
                 game.getPlayers().forEach(p -> p.setCards(getRandomCards()));
                 game.setState(GameState.PROCESSING);
 
-                executor.schedule(() -> setSelectingAnswersState(game.getId()), 5, TimeUnit.SECONDS);
+                executor.schedule(() -> setProcessingState(game.getId()), PROCESSING_DELAY, TimeUnit.SECONDS);
             } else {
                 player.setCards(getRandomCards());
             }
@@ -207,7 +216,7 @@ public class GameService {
         GameDto result = mapper.toDto(game);
         simpMessagingTemplate.convertAndSend(TOPIC + result.getId(), result);
 
-        executor.schedule(() -> setSelectingAnswersState(game.getId()), 5, TimeUnit.SECONDS);
+        executor.schedule(() -> setSelectingAnswersState(game.getId()), PROCESSING_DELAY, TimeUnit.SECONDS);
     }
 
     @Transactional
@@ -223,7 +232,7 @@ public class GameService {
         GameDto result = mapper.toDto(game);
         simpMessagingTemplate.convertAndSend(TOPIC + result.getId(), result);
 
-        executor.schedule(() -> setSelectingVictoriousAnswerState(game.getId()), 20, TimeUnit.SECONDS);
+        executor.schedule(() -> setSelectingVictoriousAnswerState(game.getId()), SELECTING_ANSWERS_DELAY, TimeUnit.SECONDS);
     }
 
     @Transactional
@@ -240,7 +249,7 @@ public class GameService {
         GameDto result = mapper.toDto(repository.save(game));
         simpMessagingTemplate.convertAndSend(TOPIC + result.getId(), result);
 
-        executor.schedule(() -> setShowingVictoriousAnswerState(game.getId()), 20, TimeUnit.SECONDS);
+        executor.schedule(() -> setShowingVictoriousAnswerState(game.getId()), SELECTING_ANSWERS_DELAY, TimeUnit.SECONDS);
     }
 
     @Transactional
@@ -267,7 +276,7 @@ public class GameService {
         GameDto result = mapper.toDto(game);
         simpMessagingTemplate.convertAndSend(TOPIC + result.getId(), result);
 
-        executor.schedule(() -> setProcessingState(game.getId()), 10, TimeUnit.SECONDS);
+        executor.schedule(() -> setProcessingState(game.getId()), PROCESSING_DELAY, TimeUnit.SECONDS);
     }
 
     @Transactional
@@ -289,7 +298,7 @@ public class GameService {
     }
 
     @Transactional
-    public Player preparePlayer(String username, Game game) {
+    public Player preparePlayer(String username) {
         Player player = playerRepository.findByUsername(username)
                 .orElseThrow(() -> new BusinessException("Player not found"));
 
