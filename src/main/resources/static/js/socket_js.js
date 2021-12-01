@@ -3,13 +3,14 @@ let stompClient;
 
 let username = null;
 let password = null;
+let gameId = null;
 
 function connectToSocket(game) {
     console.log("connecting to the game " + game.id);
     
     let socket = new SockJS(url + "/gameplay");
     stompClient = Stomp.over(socket);
-    stompClient.connect({}, function (frame) {
+    stompClient.connect({"Authorization":auth()}, function (frame) {
         console.log("connected to the frame: " + frame);
         stompClient.subscribe("/topic/game-progress/" + game.id, function (response) {
             let data = JSON.parse(response.body);
@@ -18,6 +19,8 @@ function connectToSocket(game) {
     })
 
     get("menu").style.visibility = "hidden";
+    gameId = game.id;
+
     update(game);
 }
 
@@ -112,6 +115,45 @@ function getAvailableGames() {
         }
     })
 }
+
+function postSelectCard(cardId) {
+    $.ajax({
+        url: url + "/game/select-card",
+        type: 'POST',
+        dataType: "json",
+        contentType: "application/json",
+        headers: {
+            "Authorization": auth()
+        },
+        data: JSON.stringify({
+            "cardId": cardId,
+            "gameId": gameId
+        }),
+        error: function (error) {
+            console.log(error);
+        }
+    })
+}
+
+function postSelectAnswer(victoriousPlayerId) {
+    $.ajax({
+        url: url + "/game/select-victorious-answer",
+        type: 'POST',
+        dataType: "json",
+        contentType: "application/json",
+        headers: {
+            "Authorization": auth()
+        },
+        data: JSON.stringify({
+            "victoriousPlayerId": victoriousPlayerId,
+            "gameId": gameId
+        }),
+        error: function (error) {
+            console.log(error);
+        }
+    })
+}
+
 
 function auth() {
     return JSON.stringify({

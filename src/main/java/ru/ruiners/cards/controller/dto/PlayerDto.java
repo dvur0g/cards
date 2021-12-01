@@ -11,5 +11,6 @@ public class PlayerDto {
     private String username;
     private Integer score;
     private List<CardDto> cards;
+    private CardDto selectedAnswer;
 
 }

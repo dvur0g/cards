@@ -11,4 +11,5 @@ public interface CardRepository extends CrudRepository <Card, Long> {
 
     @Query(value = "SELECT * FROM card ORDER BY random() LIMIT (:amount)", nativeQuery = true)
     List<Card> getRandomCards(@Param("amount") int amount);
+
 }

@@ -3,7 +3,9 @@ function update(game) {
     updatePlayersList(game.players);
     updateGameState(game.state);
     updateCardHolders(game.players);
+    updateSelectedAnswers(game.players);
     updateCurrentPlayer(game.currentPlayer);
+    updateQuestion(game.currentQuestion);
 
     if (game.state === "IN_PROGRESS") {
 
@@ -16,7 +18,7 @@ function updatePlayersList(players) {
     let playersListText = "";
     let i = 0;
     players.forEach(player => {
-        playersListText += ++i + ". " + player.username + player.score + ", ";
+        playersListText += ++i + ". " + player.username + " | " + player.score + ",\ ";
     })
     get("playersList").innerHTML = playersListText;
 }
@@ -32,7 +34,6 @@ function updateCardHolders(players) {
     if (!!cards) {
         for (; i < cards.length; ++i) {
             visible("cardHolder" + i);
-
             get("cardHolder" + i + "id").innerHTML = cards[i].id;
             get("cardHolder" + i + "text").innerHTML = cards[i].text;
         }
@@ -41,6 +42,27 @@ function updateCardHolders(players) {
     for (; i < 10; ++i) {
         hide("cardHolder" + i);
         clear("cardHolder" + i + "id");
+    }
+}
+
+function updateSelectedAnswers(players) {
+    let i = 0;
+
+    players.forEach(player => {
+        let selectedAnswer = player.selectedAnswer;
+
+        if (!!selectedAnswer) {
+            get("cardSelected" + i + "id").innerHTML = selectedAnswer.id;
+            get("cardSelected" + i + "text").innerHTML = selectedAnswer.text;
+            get("cardSelected" + i + "userId").innerHTML = player.id;
+            visible("cardSelected" + i);
+            ++i;
+        }
+    });
+
+    for (; i < 10; ++i) {
+        hide("cardSelected" + i);
+        clear("cardSelected" + i + "id");
     }
 }
 
@@ -68,6 +90,12 @@ function updateCurrentCredentials() {
     return true;
 }
 
+function updateQuestion(question) {
+    if (!!question) {
+        get("question").innerHTML = question.text;
+    }
+}
+
 function showAvailableGamesList(games) {
     const list = document.createElement('ul');
 
@@ -93,9 +121,19 @@ function showAvailableGamesList(games) {
 }
 
 function selectCard(cardHolderIndex) {
+    let cardId = get("cardHolder" + cardHolderIndex + "id").innerHTML;
 
+    if (!!cardId) {
+        postSelectCard(cardId)
+    }
+}
 
-    hide("cardHolder" + cardHolderIndex);
+function selectAnswer(cardSelectedIndex) {
+    let victoriousPlayerId = get("cardSelected" + cardSelectedIndex + "userId").innerHTML;
+
+    if (!!victoriousPlayerId) {
+        postSelectAnswer(victoriousPlayerId)
+    }
 }
 
 function showMenu() {
