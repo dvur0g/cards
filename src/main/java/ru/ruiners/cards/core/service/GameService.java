@@ -90,7 +90,7 @@ public class GameService {
                 game.getPlayers().forEach(p -> p.setCards(getRandomCards()));
                 game.setState(GameState.PROCESSING);
 
-                executor.schedule(() -> setProcessingState(game.getId()), PROCESSING_DELAY, TimeUnit.SECONDS);
+                executor.schedule(() -> setSelectingAnswersState(game.getId()), PROCESSING_DELAY, TimeUnit.SECONDS);
             } else {
                 player.setCards(getRandomCards());
             }
