@@ -1,3 +1,4 @@
+let currentTimer;
 
 function update(game) {
     updatePlayersList(game.players);
@@ -6,12 +7,8 @@ function update(game) {
     updateSelectedAnswers(game.players);
     updateCurrentPlayer(game.currentPlayer);
     updateQuestion(game.currentQuestion);
-
-    if (game.state === "IN_PROGRESS") {
-
-    } else {
-
-    }
+    updateTimer(game.timer);
+    updateVictoriousAnswer(game.victoriousAnswer);
 }
 
 function updatePlayersList(players) {
@@ -96,6 +93,21 @@ function updateQuestion(question) {
     }
 }
 
+function updateTimer(timer) {
+    if (!!timer) {
+        clearInterval(currentTimer);
+        startTimer(timer.countdown);
+    }
+}
+
+function updateVictoriousAnswer(victoriousAnswer) {
+    if (!!victoriousAnswer) {
+        get("victoriousAnswer").innerHTML = victoriousAnswer.text;
+    } else {
+        get("victoriousAnswer").innerHTML = "";
+    }
+}
+
 function showAvailableGamesList(games) {
     const list = document.createElement('ul');
 
@@ -162,6 +174,17 @@ function isEmpty(value, message) {
     } else {
         return false;
     }
+}
+
+function startTimer(duration) {
+    currentTimer = setInterval(function () {
+        get("timer").innerHTML = duration;
+
+        if (--duration < 0) {
+            clearInterval(currentTimer);
+        }
+
+    }, 1000);
 }
 
 function clear(elementId) {

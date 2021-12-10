@@ -29,7 +29,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class GameService {
 
-    private static final int MIN_PLAYERS_AMOUNT = 3;
     private static final int MAX_PLAYERS_AMOUNT = 10;
     private static final int STARTING_CARDS_AMOUNT = 10;
     private static final int PROCESSING_DELAY = 10;
@@ -56,7 +55,7 @@ public class GameService {
 
     @Transactional
     public GameDto createGame(String username, Integer minPlayersAmount) {
-        if (minPlayersAmount > MAX_PLAYERS_AMOUNT || minPlayersAmount < MIN_PLAYERS_AMOUNT) {
+        if (minPlayersAmount > MAX_PLAYERS_AMOUNT) {
             throw new BusinessException("Invalid players amount");
         }
         Game game = new Game();
@@ -97,7 +96,7 @@ public class GameService {
         }
         repository.save(game);
 
-        GameDto result = mapper.toDto(game);
+        GameDto result = mapper.toDto(game, PROCESSING_DELAY);
         simpMessagingTemplate.convertAndSend(TOPIC + result.getId(), result);
         return result;
     }
@@ -213,7 +212,7 @@ public class GameService {
         game.setVictoriousAnswer(null);
         repository.save(game);
 
-        GameDto result = mapper.toDto(game);
+        GameDto result = mapper.toDto(game, PROCESSING_DELAY);
         simpMessagingTemplate.convertAndSend(TOPIC + result.getId(), result);
 
         executor.schedule(() -> setSelectingAnswersState(game.getId()), PROCESSING_DELAY, TimeUnit.SECONDS);
@@ -229,7 +228,7 @@ public class GameService {
         game.setState(GameState.SELECTING_ANSWERS);
         repository.save(game);
 
-        GameDto result = mapper.toDto(game);
+        GameDto result = mapper.toDto(game, SELECTING_ANSWERS_DELAY);
         simpMessagingTemplate.convertAndSend(TOPIC + result.getId(), result);
 
         executor.schedule(() -> setSelectingVictoriousAnswerState(game.getId()), SELECTING_ANSWERS_DELAY, TimeUnit.SECONDS);
@@ -246,7 +245,7 @@ public class GameService {
 
         game.setState(GameState.SELECTING_VICTORIOUS_ANSWER);
 
-        GameDto result = mapper.toDto(repository.save(game));
+        GameDto result = mapper.toDto(repository.save(game), SELECTING_ANSWERS_DELAY);
         simpMessagingTemplate.convertAndSend(TOPIC + result.getId(), result);
 
         executor.schedule(() -> setShowingVictoriousAnswerState(game.getId()), SELECTING_ANSWERS_DELAY, TimeUnit.SECONDS);
@@ -273,7 +272,7 @@ public class GameService {
         game.getPlayers().forEach(Player::removeSelectedAnswer);
         repository.save(game);
 
-        GameDto result = mapper.toDto(game);
+        GameDto result = mapper.toDto(game, PROCESSING_DELAY);
         simpMessagingTemplate.convertAndSend(TOPIC + result.getId(), result);
 
         executor.schedule(() -> setProcessingState(game.getId()), PROCESSING_DELAY, TimeUnit.SECONDS);
