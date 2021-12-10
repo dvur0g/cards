@@ -26,6 +26,7 @@ public class Game {
 
     @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(cascade = CascadeType.ALL)
+    @OrderBy("id")
     private List<Player> players;
 
     @Enumerated(EnumType.STRING)
@@ -40,6 +41,9 @@ public class Game {
 
     private Integer currentPlayerIndex = 0;
 
+    @OneToOne
+    private Player currentPlayer;
+
     private Integer minPlayersAmount;
 
     @ManyToOne
@@ -49,15 +53,13 @@ public class Game {
         return getPlayers().stream().filter(Player::isWinner).findAny();
     }
 
-    public Player getCurrentPlayer() {
-        if (currentPlayerIndex >= players.size()) {
-            currentPlayerIndex = 0;
-        }
+    public void setNextCurrentPlayer() {
         if (players.size() == 0) {
-            currentPlayerIndex = null;
-            return null;
+            currentPlayerIndex = 0;
+            currentPlayer = null;
         }
-        return players.get(currentPlayerIndex);
+        currentPlayerIndex = (++currentPlayerIndex) % players.size();
+        currentPlayer = players.get(currentPlayerIndex);
     }
 
 }

@@ -16,7 +16,8 @@ public interface GameMapper {
     GameDto toDto(Game game, Integer countdown);
 
     @Named("toTimer")
-    default TimerDto countdownToTimer(int countdown) {
+    default TimerDto toTimer(int countdown) {
         return new TimerDto().setCountdown(countdown);
     }
+
 }

@@ -29,11 +29,10 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class GameService {
 
-    private static final int MAX_PLAYERS_AMOUNT = 10;
-    private static final int STARTING_CARDS_AMOUNT = 10;
+    private static final int MAX_PLAYERS_AMOUNT = 5;
+    private static final int MAX_CARDS_AMOUNT = 10;
     private static final int PROCESSING_DELAY = 10;
     private static final int SELECTING_ANSWERS_DELAY = 20;
-
 
     private static final String TOPIC = "/topic/game-progress/";
     private static final Set<GameState> playingGameStates = Set.of(
@@ -95,7 +94,7 @@ public class GameService {
         }
         repository.save(game);
 
-        GameDto result = mapper.toDto(game, PROCESSING_DELAY);
+        GameDto result = mapper.toDto(game);
         simpMessagingTemplate.convertAndSend(TOPIC + result.getId(), result);
         return result;
     }
@@ -223,7 +222,7 @@ public class GameService {
         Game game = getGameById(gameId);
 
         game.setCurrentQuestion(getRandomQuestion());
-        game.setCurrentPlayerIndex((game.getCurrentPlayerIndex() + 1) % game.getPlayers().size());
+        game.setNextCurrentPlayer();
         game.setState(GameState.SELECTING_ANSWERS);
         repository.save(game);
 
@@ -242,14 +241,22 @@ public class GameService {
             return;
         }
 
-        if (game.getPlayers().stream().noneMatch(p -> p.getSelectedAnswer() != null)) {
-            setShowingVictoriousAnswerState(game.getId());
-            return;
-        }
+        //TODO ломает цикл
+//        if (game.getPlayers().stream().noneMatch(p -> p.getSelectedAnswer() != null)) {
+//            setShowingVictoriousAnswerState(gameId);
+//            return;
+//        }
 
         game.setState(GameState.SELECTING_VICTORIOUS_ANSWER);
 
-        GameDto result = mapper.toDto(repository.save(game), SELECTING_ANSWERS_DELAY);
+        game.getPlayers().forEach(p -> {
+            if (p.getCards().size() < MAX_CARDS_AMOUNT) {
+                p.getCards().add(getRandomCard());
+            }
+        });
+        repository.save(game);
+
+        GameDto result = mapper.toDto(game, SELECTING_ANSWERS_DELAY);
         simpMessagingTemplate.convertAndSend(TOPIC + result.getId(), result);
 
         executor.schedule(() -> setShowingVictoriousAnswerState(game.getId()), SELECTING_ANSWERS_DELAY, TimeUnit.SECONDS);
@@ -323,7 +330,11 @@ public class GameService {
     }
 
     private List<Card> getRandomCards() {
-        return cardRepository.getRandomCards(STARTING_CARDS_AMOUNT);
+        return cardRepository.getRandomCards(MAX_CARDS_AMOUNT);
+    }
+
+    private Card getRandomCard() {
+        return cardRepository.getRandomCards(1).get(0);
     }
 
     private Question getRandomQuestion() {
