@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class GameService {
 
-    private static final int MIN_PLAYERS_AMOUNT = 3;
+    private static final int MIN_PLAYERS_AMOUNT = 2;
     private static final int MAX_PLAYERS_AMOUNT = 10;
     private static final int STARTING_CARDS_AMOUNT = 10;
     private static final int PROCESSING_DELAY = 10;
