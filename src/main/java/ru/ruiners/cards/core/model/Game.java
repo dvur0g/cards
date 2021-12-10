@@ -44,6 +44,9 @@ public class Game {
     @OneToOne
     private Player currentPlayer;
 
+    @OneToOne
+    private Player victoriousPlayer;
+
     private Integer minPlayersAmount;
 
     @ManyToOne

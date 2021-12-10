@@ -178,7 +178,6 @@ public class GameService {
         }
 
         Player currentPlayer = game.getCurrentPlayer();
-
         if (currentPlayer == null || !currentPlayer.getUsername().equals(authorizationDto.getUsername())) {
             throw new BusinessException("Player null or not the host");
         }
@@ -191,7 +190,7 @@ public class GameService {
             throw new BusinessException("Victorious player did not select card");
         }
 
-        game.setVictoriousAnswer(victoriousPlayer.getSelectedAnswer());
+        game.setVictoriousPlayer(victoriousPlayer);
         repository.save(game);
 
         setShowingVictoriousAnswerState(game.getId());
@@ -249,11 +248,11 @@ public class GameService {
 
         game.setState(GameState.SELECTING_VICTORIOUS_ANSWER);
 
-        game.getPlayers().forEach(p -> {
-            if (p.getCards().size() < MAX_CARDS_AMOUNT) {
-                p.getCards().add(getRandomCard());
-            }
-        });
+//        game.getPlayers().forEach(p -> {
+//            if (p.getCards().size() < MAX_CARDS_AMOUNT) {
+//                p.getCards().add(getRandomCard());
+//            }
+//        });
         repository.save(game);
 
         GameDto result = mapper.toDto(game, SELECTING_ANSWERS_DELAY);
@@ -271,14 +270,12 @@ public class GameService {
             return;
         }
 
-        Optional<Player> victoriousPlayer = game.getPlayers().stream()
-                .filter(player -> player.getSelectedAnswer() != null)
-                .findAny();
-
-        if (victoriousPlayer.isPresent()) {
-            game.setVictoriousAnswer(victoriousPlayer.get().getSelectedAnswer());
-            victoriousPlayer.get().incrementScore();
+        Player victoriousPlayer = game.getVictoriousPlayer();
+        if (victoriousPlayer != null) {
+            game.setVictoriousAnswer(victoriousPlayer.getSelectedAnswer());
+            victoriousPlayer.incrementScore();
         }
+
         game.setState(GameState.SHOW_VICTORIOUS_ANSWER);
         game.getPlayers().forEach(Player::removeSelectedAnswer);
         repository.save(game);
