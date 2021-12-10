@@ -5,7 +5,7 @@ function update(game) {
     updateGameState(game.state);
     updateCardHolders(game.players);
     updateSelectedAnswers(game.players);
-    updateCurrentPlayer(game.currentPlayer);
+    updateCurrentPlayer(game);
     updateQuestion(game.currentQuestion);
     updateTimer(game.timer);
     updateVictoriousAnswer(game.victoriousAnswer);
@@ -63,8 +63,12 @@ function updateSelectedAnswers(players) {
     }
 }
 
-function updateCurrentPlayer(player) {
-    if (!!player) {
+function updateCurrentPlayer(game) {
+    let currentPlayer = game.players[game.currentPlayerIndex];
+
+    console.log("currentPlayer: " + currentPlayer);
+
+    if (!!currentPlayer) {
         get("currentPlayer").innerHTML = player.username;
     }
 }

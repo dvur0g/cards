@@ -38,8 +38,7 @@ public class Game {
     @ManyToOne
     private Question currentQuestion;
 
-    @ManyToOne
-    private Player currentPlayer;
+    private Integer currentPlayerIndex = 0;
 
     private Integer minPlayersAmount;
 
@@ -48,6 +47,17 @@ public class Game {
 
     public Optional<Player> getWinnerOptional() {
         return getPlayers().stream().filter(Player::isWinner).findAny();
+    }
+
+    public Player getCurrentPlayer() {
+        if (currentPlayerIndex >= players.size()) {
+            currentPlayerIndex = 0;
+        }
+        if (players.size() == 0) {
+            currentPlayerIndex = null;
+            return null;
+        }
+        return players.get(currentPlayerIndex);
     }
 
 }

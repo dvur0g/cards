@@ -50,7 +50,6 @@ public class GameService {
 
     private final GameMapper mapper;
 
-    private final Random random = new Random();
     private final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
     @Transactional
@@ -224,7 +223,7 @@ public class GameService {
         Game game = getGameById(gameId);
 
         game.setCurrentQuestion(getRandomQuestion());
-        game.setCurrentPlayer(game.getPlayers().get(random.nextInt(game.getPlayers().size())));
+        game.setCurrentPlayerIndex((game.getCurrentPlayerIndex() + 1) % game.getPlayers().size());
         game.setState(GameState.SELECTING_ANSWERS);
         repository.save(game);
 
@@ -240,6 +239,11 @@ public class GameService {
         Game game = getGameById(gameId);
 
         if (!game.getState().equals(GameState.SELECTING_ANSWERS)) {
+            return;
+        }
+
+        if (game.getPlayers().stream().noneMatch(p -> p.getSelectedAnswer() != null)) {
+            setShowingVictoriousAnswerState(game.getId());
             return;
         }
 
