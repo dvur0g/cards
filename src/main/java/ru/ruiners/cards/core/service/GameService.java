@@ -274,6 +274,7 @@ public class GameService {
         if (victoriousPlayer != null) {
             game.setVictoriousAnswer(victoriousPlayer.getSelectedAnswer());
             victoriousPlayer.incrementScore();
+            game.setVictoriousPlayer(null);
         }
 
         game.setState(GameState.SHOW_VICTORIOUS_ANSWER);

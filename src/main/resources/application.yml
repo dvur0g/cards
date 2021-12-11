@@ -1,0 +1,19 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: cards
+  datasource:
+    hikari:
+      connection-timeout: 20000
+      maximum-pool-size: 5
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:postgres}?currentSchema=${POSTGRES_SCHEMA:cards}
+    username: postgres
+    password: postgres
+  liquibase:
+    change-log: classpath:db/changelog.yml
+    default-schema: ${POSTGRES_SCHEMA:cards}
+#  jpa:
+#    hibernate:
+#      ddl-auto: create
