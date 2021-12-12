@@ -3,11 +3,13 @@ services:
 
   cards:
     image: cards:v1
+    container_name: cards
     restart: "no"
     depends_on:
       - database
     environment:
       POSTGRES_HOST: database
+      POSTGRES_SCHEMA: public
     expose:
       - 8080
     ports:
@@ -15,6 +17,7 @@ services:
 
   database:
     image: postgres
+    container_name: database
     restart: always
     environment:
       POSTGRES_DB: cards
@@ -24,3 +27,5 @@ services:
       - 5432
     ports:
       - "5432:5432"
+    volumes:
+      - ./src/main/resources/db/schema:/docker-entrypoint-initdb.d/
