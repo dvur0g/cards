@@ -29,12 +29,10 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class GameService {
 
-    private static final int MIN_PLAYERS_AMOUNT = 2;
-    private static final int MAX_PLAYERS_AMOUNT = 10;
-    private static final int STARTING_CARDS_AMOUNT = 10;
+    private static final int MAX_PLAYERS_AMOUNT = 5;
+    private static final int MAX_CARDS_AMOUNT = 10;
     private static final int PROCESSING_DELAY = 10;
     private static final int SELECTING_ANSWERS_DELAY = 20;
-
 
     private static final String TOPIC = "/topic/game-progress/";
     private static final Set<GameState> playingGameStates = Set.of(
@@ -51,12 +49,11 @@ public class GameService {
 
     private final GameMapper mapper;
 
-    private final Random random = new Random();
     private final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
     @Transactional
     public GameDto createGame(String username, Integer minPlayersAmount) {
-        if (minPlayersAmount > MAX_PLAYERS_AMOUNT || minPlayersAmount < MIN_PLAYERS_AMOUNT) {
+        if (minPlayersAmount > MAX_PLAYERS_AMOUNT) {
             throw new BusinessException("Invalid players amount");
         }
         Game game = new Game();
@@ -90,7 +87,7 @@ public class GameService {
                 game.getPlayers().forEach(p -> p.setCards(getRandomCards()));
                 game.setState(GameState.PROCESSING);
 
-                executor.schedule(() -> setProcessingState(game.getId()), PROCESSING_DELAY, TimeUnit.SECONDS);
+                executor.schedule(() -> setSelectingAnswersState(game.getId()), PROCESSING_DELAY, TimeUnit.SECONDS);
             } else {
                 player.setCards(getRandomCards());
             }
@@ -181,7 +178,6 @@ public class GameService {
         }
 
         Player currentPlayer = game.getCurrentPlayer();
-
         if (currentPlayer == null || !currentPlayer.getUsername().equals(authorizationDto.getUsername())) {
             throw new BusinessException("Player null or not the host");
         }
@@ -194,7 +190,7 @@ public class GameService {
             throw new BusinessException("Victorious player did not select card");
         }
 
-        game.setVictoriousAnswer(victoriousPlayer.getSelectedAnswer());
+        game.setVictoriousPlayer(victoriousPlayer);
         repository.save(game);
 
         setShowingVictoriousAnswerState(game.getId());
@@ -213,7 +209,7 @@ public class GameService {
         game.setVictoriousAnswer(null);
         repository.save(game);
 
-        GameDto result = mapper.toDto(game);
+        GameDto result = mapper.toDto(game, PROCESSING_DELAY);
         simpMessagingTemplate.convertAndSend(TOPIC + result.getId(), result);
 
         executor.schedule(() -> setSelectingAnswersState(game.getId()), PROCESSING_DELAY, TimeUnit.SECONDS);
@@ -225,11 +221,11 @@ public class GameService {
         Game game = getGameById(gameId);
 
         game.setCurrentQuestion(getRandomQuestion());
-        game.setCurrentPlayer(game.getPlayers().get(random.nextInt(game.getPlayers().size())));
+        game.setNextCurrentPlayer();
         game.setState(GameState.SELECTING_ANSWERS);
         repository.save(game);
 
-        GameDto result = mapper.toDto(game);
+        GameDto result = mapper.toDto(game, SELECTING_ANSWERS_DELAY);
         simpMessagingTemplate.convertAndSend(TOPIC + result.getId(), result);
 
         executor.schedule(() -> setSelectingVictoriousAnswerState(game.getId()), SELECTING_ANSWERS_DELAY, TimeUnit.SECONDS);
@@ -244,9 +240,22 @@ public class GameService {
             return;
         }
 
+        //TODO ломает цикл
+//        if (game.getPlayers().stream().noneMatch(p -> p.getSelectedAnswer() != null)) {
+//            setShowingVictoriousAnswerState(gameId);
+//            return;
+//        }
+
         game.setState(GameState.SELECTING_VICTORIOUS_ANSWER);
 
-        GameDto result = mapper.toDto(repository.save(game));
+//        game.getPlayers().forEach(p -> {
+//            if (p.getCards().size() < MAX_CARDS_AMOUNT) {
+//                p.getCards().add(getRandomCard());
+//            }
+//        });
+        repository.save(game);
+
+        GameDto result = mapper.toDto(game, SELECTING_ANSWERS_DELAY);
         simpMessagingTemplate.convertAndSend(TOPIC + result.getId(), result);
 
         executor.schedule(() -> setShowingVictoriousAnswerState(game.getId()), SELECTING_ANSWERS_DELAY, TimeUnit.SECONDS);
@@ -261,19 +270,18 @@ public class GameService {
             return;
         }
 
-        Optional<Player> victoriousPlayer = game.getPlayers().stream()
-                .filter(player -> player.getSelectedAnswer() != null)
-                .findAny();
-
-        if (victoriousPlayer.isPresent()) {
-            game.setVictoriousAnswer(victoriousPlayer.get().getSelectedAnswer());
-            victoriousPlayer.get().incrementScore();
+        Player victoriousPlayer = game.getVictoriousPlayer();
+        if (victoriousPlayer != null) {
+            game.setVictoriousAnswer(victoriousPlayer.getSelectedAnswer());
+            victoriousPlayer.incrementScore();
+            game.setVictoriousPlayer(null);
         }
+
         game.setState(GameState.SHOW_VICTORIOUS_ANSWER);
         game.getPlayers().forEach(Player::removeSelectedAnswer);
         repository.save(game);
 
-        GameDto result = mapper.toDto(game);
+        GameDto result = mapper.toDto(game, PROCESSING_DELAY);
         simpMessagingTemplate.convertAndSend(TOPIC + result.getId(), result);
 
         executor.schedule(() -> setProcessingState(game.getId()), PROCESSING_DELAY, TimeUnit.SECONDS);
@@ -320,7 +328,11 @@ public class GameService {
     }
 
     private List<Card> getRandomCards() {
-        return cardRepository.getRandomCards(STARTING_CARDS_AMOUNT);
+        return cardRepository.getRandomCards(MAX_CARDS_AMOUNT);
+    }
+
+    private Card getRandomCard() {
+        return cardRepository.getRandomCards(1).get(0);
     }
 
     private Question getRandomQuestion() {

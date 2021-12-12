@@ -13,7 +13,7 @@ import java.util.List;
 @Where(clause = "deleted = false")
 public class Player {
 
-    private static final int MAX_SCORE = 10;
+    private static final int MAX_SCORE = 5;
 
     @Id
     @GeneratedValue(

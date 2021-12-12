@@ -16,5 +16,6 @@ public class GameDto {
     private List<PlayerDto> players;
     private QuestionDto currentQuestion;
     private PlayerDto winner;
+    private TimerDto timer;
 
 }
