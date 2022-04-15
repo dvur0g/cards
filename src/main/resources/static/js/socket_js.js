@@ -18,6 +18,15 @@ document.addEventListener("DOMContentLoaded", function() {
     })
 });
 
+window.onbeforeunload = disconnectFromGameBeforeClosingPage;
+function disconnectFromGameBeforeClosingPage() {
+    $.ajax({
+        url: url + "/game/disconnect",
+        type: 'POST'
+    });
+    stompClient.disconnect();
+}
+
 function connectToSocket(game) {
     console.log("connecting to the game " + game.id);
     

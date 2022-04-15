@@ -47,4 +47,8 @@ public class Player {
         return score == MAX_SCORE;
     }
 
+    public boolean didSelectAnswer() {
+        return selectedAnswer != null;
+    }
+
 }

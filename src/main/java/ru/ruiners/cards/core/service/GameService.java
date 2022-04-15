@@ -201,6 +201,10 @@ public class GameService {
             return;
         }
 
+        if (isEverybodyLeft(gameId)) {
+            return;
+        }
+
         Game game = getGameById(gameId);
         game.setState(GameState.PROCESSING);
         game.setVictoriousAnswer(null);
@@ -244,13 +248,14 @@ public class GameService {
 //        }
 
         game.setState(GameState.SELECTING_VICTORIOUS_ANSWER);
-
-//        game.getPlayers().forEach(p -> {
-//            if (p.getCards().size() < MAX_CARDS_AMOUNT) {
-//                p.getCards().add(getRandomCard());
-//            }
-//        });
         repository.save(game);
+
+        game.getPlayers().forEach(p -> {
+            if (p.getCards().size() < MAX_CARDS_AMOUNT) {
+                p.getCards().add(getRandomCard());
+                playerRepository.save(p);
+            }
+        });
 
         GameDto result = mapper.toDto(game, SELECTING_ANSWERS_DELAY);
         simpMessagingTemplate.convertAndSend(TOPIC + result.getId(), result);
@@ -294,10 +299,28 @@ public class GameService {
 
         log.info("set FINISHED state for game {}", game.getId());
 
-        game.setWinner(game.getWinnerOptional().get());
+        Optional<Player> winnerOptional = game.getWinnerOptional();
+        game.setWinner(winnerOptional.orElse(null));
         game.setState(GameState.FINISHED);
 
-        GameDto result = mapper.toDto(game);
+        GameDto result = mapper.toDto(repository.save(game));
+        simpMessagingTemplate.convertAndSend(TOPIC + result.getId(), result);
+        return true;
+    }
+
+    @Transactional
+    public boolean isEverybodyLeft(Long gameId) {
+        Game game = getGameById(gameId);
+
+        if (game.getPlayers().size() >= 2) {
+            return false;
+        }
+
+        log.info("set FINISHED state for game {}", game.getId());
+
+        game.setState(GameState.CANCELLED);
+
+        GameDto result = mapper.toDto(repository.save(game));
         simpMessagingTemplate.convertAndSend(TOPIC + result.getId(), result);
         return true;
     }

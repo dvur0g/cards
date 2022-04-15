@@ -153,9 +153,9 @@ function isEmpty(value, message) {
 
 function startTimer(duration) {
     currentTimer = setInterval(function () {
-        get("timer").innerHTML = duration;
+        get("timer").innerHTML = --duration;
 
-        if (--duration < 0) {
+        if (duration < 0) {
             clearInterval(currentTimer);
         }
 
