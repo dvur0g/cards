@@ -69,24 +69,6 @@ function updateCurrentPlayer(currentPlayer) {
     }
 }
 
-function updateCurrentCredentials() {
-    let usernameValue = get("username").value;
-    let passwordValue = get("password").value;
-
-    if (isEmpty(usernameValue, "Please enter username")) {
-        return false;
-    }
-    if (isEmpty(passwordValue, "Please enter password")) {
-        return false;
-    }
-
-    username = usernameValue;
-    password = passwordValue;
-
-    get("currentUsername").innerHTML = username;
-    return true;
-}
-
 function updateQuestion(question) {
     if (!!question) {
         get("question").innerHTML = question.text;
@@ -158,13 +140,6 @@ function hide(elementId) {
 
 function visible(elementId) {
     get(elementId).style.visibility = "visible";
-}
-
-function clearUsername() {
-    username = null;
-    password = null;
-    clear("currentUsername");
-    clear("password");
 }
 
 function isEmpty(value, message) {

@@ -1,16 +1,21 @@
 package ru.ruiners.cards.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.keycloak.KeycloakPrincipal;
+import org.keycloak.KeycloakSecurityContext;
+import org.keycloak.representations.AccessToken;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import ru.ruiners.cards.controller.dto.*;
 import ru.ruiners.cards.core.service.GameService;
-import ru.ruiners.cards.security.AuthorizationService;
+import ru.ruiners.cards.service.AuthenticationService;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @Slf4j
@@ -19,53 +24,62 @@ import java.util.List;
 public class GameController {
 
     private final GameService gameService;
-    private final AuthorizationService authorizationService;
-
-    private static final int MIN_PLAYERS_AMOUNT = 2;
+    private final AuthenticationService authenticationService;
 
     @PostMapping("/create")
-    public ResponseEntity<GameDto> start(@RequestBody RequestDto request) {
-        log.info("create game request: {}", request);
-        GameDto game = gameService.createGame(request.getUsername(), MIN_PLAYERS_AMOUNT);
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<GameDto> create() {
+        String username = authenticationService.getUsername();
+        log.info("create game request from: {}", username);
+
+        GameDto game = gameService.createGame(username);
+        log.info("created game: {}", game);
+
         return ResponseEntity.ok(game);
     }
 
     @PostMapping("/connect")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<GameDto> connect(@RequestBody RequestDto request) {
         log.info("connect request: {}", request);
-        GameDto game = gameService.connectToGame(request.getUsername(), request.getGameId());
+        GameDto game = gameService.connectToGame(authenticationService.getUsername(), request.getGameId());
         log.info("send gameDto to all players {}", game);
         return ResponseEntity.ok(game);
     }
 
     @PostMapping("/disconnect")
-    public void disconnect(@RequestBody RequestDto request) {
-        log.info("disconnect request: {}", request);
-        gameService.disconnectFromGame(request.getUsername());
+    @PreAuthorize("hasRole('USER')")
+    public void disconnect() {
+        String username = authenticationService.getUsername();
+        log.info("disconnect request from: {}", username);
+        gameService.disconnectFromGame(username);
     }
 
     @GetMapping("/list")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<List<GameDto>> getAvailableGamesList() {
         return ResponseEntity.ok(gameService.getGamesToConnect());
     }
 
     @PostMapping("/gameplay")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<GameDto> gamePlay(@RequestBody GamePlayDto request) {
         log.info("gameplay: {}", request);
-        return ResponseEntity.ok(gameService.gamePlay(request));
+        return ResponseEntity.ok(gameService.gamePlay(request, authenticationService.getUsername()));
     }
 
     @PostMapping("/select-card")
-    public void selectCard(@RequestBody SelectCardDto selectCard, HttpServletRequest request) throws JsonProcessingException {
+    @PreAuthorize("hasRole('USER')")
+    public void selectCard(@RequestBody SelectCardDto selectCard) {
         log.info("select card: {}", selectCard);
-        gameService.selectAnswer(selectCard, authorizationService.getAuthenticateDto(request));
+        gameService.selectAnswer(selectCard, authenticationService.getUsername());
     }
 
     @PostMapping("/select-victorious-answer")
-    public void selectVictoriousAnswer(@RequestBody SelectVictoriousAnswerDto selectVictoriousAnswer,
-                                       HttpServletRequest request) throws JsonProcessingException {
+    @PreAuthorize("hasRole('USER')")
+    public void selectVictoriousAnswer(@RequestBody SelectVictoriousAnswerDto selectVictoriousAnswer) {
         log.info("select victorious answer: {}", selectVictoriousAnswer);
-        gameService.selectVictoriousAnswer(selectVictoriousAnswer, authorizationService.getAuthenticateDto(request));
+        gameService.selectVictoriousAnswer(selectVictoriousAnswer, authenticationService.getUsername());
     }
 
 }

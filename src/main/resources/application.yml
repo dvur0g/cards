@@ -8,12 +8,18 @@ spring:
     hikari:
       connection-timeout: 20000
       maximum-pool-size: 5
-    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:postgres}?currentSchema=${POSTGRES_SCHEMA:cards}
+    url: jdbc:postgresql://localhost:5432/cards?currentSchema=cards
     username: postgres
     password: postgres
   liquibase:
     change-log: classpath:db/changelog.yml
-    default-schema: ${POSTGRES_SCHEMA:cards}
+#    default-schema: cards
 #  jpa:
 #    hibernate:
 #      ddl-auto: create
+
+keycloak:
+  auth-server-url: http://localhost:8484/auth
+  realm: cards_realm
+  resource: client
+  public-client: true

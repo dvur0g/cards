@@ -1,11 +1,12 @@
 package ru.ruiners.cards.controller.dto;
 
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 @Data
-public class AuthorizationDto {
+@Accessors(chain = true)
+public class MeDto {
 
     private String username;
-    private String password;
 
 }

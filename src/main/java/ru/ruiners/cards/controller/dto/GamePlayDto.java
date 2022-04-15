@@ -6,6 +6,5 @@ import lombok.Data;
 public class GamePlayDto {
 
     private Long gameId;
-    private String username;
 
 }

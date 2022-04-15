@@ -2,18 +2,32 @@ const url = 'http://localhost:8080';
 let stompClient;
 
 let username = null;
-let password = null;
 let gameId = null;
+
+document.addEventListener("DOMContentLoaded", function() {
+    $.ajax({
+        url: url + "/me",
+        type: 'GET',
+        success: function (me) {
+            username = me.username
+            get("currentUsername").innerHTML = username
+        },
+        error: function (error) {
+            console.log(error);
+        }
+    })
+});
 
 function connectToSocket(game) {
     console.log("connecting to the game " + game.id);
     
     let socket = new SockJS(url + "/gameplay");
     stompClient = Stomp.over(socket);
-    stompClient.connect({"Authorization":auth()}, function (frame) {
+    stompClient.connect({}, function (frame) {
         console.log("connected to the frame: " + frame);
         stompClient.subscribe("/topic/game-progress/" + game.id, function (response) {
             let data = JSON.parse(response.body);
+
             update(data);
         })
     })
@@ -29,37 +43,15 @@ function disconnectFromGame() {
 
     $.ajax({
         url: url + "/game/disconnect",
-        type: 'POST',
-        dataType: "json",
-        contentType: "application/json",
-        headers: {
-            "Authorization": auth()
-        },
-        data: JSON.stringify({
-            "username": username
-        })
+        type: 'POST'
     });
     stompClient.disconnect();
-
-    clearUsername();
 }
 
 function createGame() {
-    if (!updateCurrentCredentials()) {
-        return;
-    }
-
     $.ajax({
         url: url + "/game/create",
         type: 'POST',
-        dataType: "json",
-        contentType: "application/json",
-        headers: {
-            "Authorization": auth()
-        },
-        data: JSON.stringify({
-            "username": username
-        }),
         success: function (game) {
             connectToSocket(game);
             alert("Your created a game. Game id is: " + game.id);
@@ -71,18 +63,11 @@ function createGame() {
 }
 
 function connectToGame(gameId) {
-    if (!updateCurrentCredentials()) {
-        return;
-    }
-
     $.ajax({
         url: url + "/game/connect",
         type: 'POST',
         dataType: "json",
         contentType: "application/json",
-        headers: {
-            "Authorization": auth()
-        },
         data: JSON.stringify({
             "username": username,
             "gameId": gameId
@@ -97,15 +82,8 @@ function connectToGame(gameId) {
 }
 
 function getAvailableGames() {
-    if (!updateCurrentCredentials()) {
-        return;
-    }
-
     $.ajax({
         url: url + "/game/list",
-        headers: {
-            "Authorization": auth()
-        },
         type: 'GET',
         success: function (gamesList) {
             showAvailableGamesList(gamesList)
@@ -122,9 +100,6 @@ function postSelectCard(cardId) {
         type: 'POST',
         dataType: "json",
         contentType: "application/json",
-        headers: {
-            "Authorization": auth()
-        },
         data: JSON.stringify({
             "cardId": cardId,
             "gameId": gameId
@@ -141,9 +116,6 @@ function postSelectAnswer(victoriousPlayerId) {
         type: 'POST',
         dataType: "json",
         contentType: "application/json",
-        headers: {
-            "Authorization": auth()
-        },
         data: JSON.stringify({
             "victoriousPlayerId": victoriousPlayerId,
             "gameId": gameId
@@ -152,12 +124,4 @@ function postSelectAnswer(victoriousPlayerId) {
             console.log(error);
         }
     })
-}
-
-
-function auth() {
-    return JSON.stringify({
-        "username": username,
-        "password": password
-    });
 }

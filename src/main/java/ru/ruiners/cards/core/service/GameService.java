@@ -33,6 +33,7 @@ public class GameService {
     private static final int MAX_CARDS_AMOUNT = 10;
     private static final int PROCESSING_DELAY = 10;
     private static final int SELECTING_ANSWERS_DELAY = 20;
+    private static final int MIN_PLAYERS_AMOUNT = 2;
 
     private static final String TOPIC = "/topic/game-progress/";
     private static final Set<GameState> playingGameStates = Set.of(
@@ -52,13 +53,10 @@ public class GameService {
     private final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
     @Transactional
-    public GameDto createGame(String username, Integer minPlayersAmount) {
-        if (minPlayersAmount > MAX_PLAYERS_AMOUNT) {
-            throw new BusinessException("Invalid players amount");
-        }
+    public GameDto createGame(String username) {
         Game game = new Game();
         game.setState(GameState.CREATED);
-        game.setMinPlayersAmount(minPlayersAmount);
+        game.setMinPlayersAmount(MIN_PLAYERS_AMOUNT);
 
         Player player = preparePlayer(username);
         game.setPlayers(List.of(player));
@@ -117,12 +115,12 @@ public class GameService {
         simpMessagingTemplate.convertAndSend(TOPIC + result.getId(), result);
     }
 
-    public GameDto gamePlay(GamePlayDto gamePlay) {
+    public GameDto gamePlay(GamePlayDto gamePlay, String username) {
         Game game = repository.findById(gamePlay.getGameId()).orElseThrow(
                 () -> new BusinessException("Game not found")
         );
 
-        if (game.getPlayers().stream().noneMatch(player -> player.getUsername().equals(gamePlay.getUsername()))) {
+        if (game.getPlayers().stream().noneMatch(player -> player.getUsername().equals(username))) {
             throw new BusinessException("No such player in the game");
         }
 
@@ -137,7 +135,7 @@ public class GameService {
     }
 
     @Transactional
-    public void selectAnswer(SelectCardDto selectCard, AuthorizationDto authorizationDto) {
+    public void selectAnswer(SelectCardDto selectCard, String username) {
         Game game = getGameById(selectCard.getGameId());
 
         if (!game.getState().equals(GameState.SELECTING_ANSWERS)) {
@@ -145,7 +143,7 @@ public class GameService {
         }
 
         Player player = game.getPlayers().stream()
-                .filter(p -> p.getUsername().equals(authorizationDto.getUsername()))
+                .filter(p -> p.getUsername().equals(username))
                 .findAny().orElseThrow(() -> new BusinessException("No such player in the game"));
 
         if (player.equals(game.getCurrentPlayer())) {
@@ -169,8 +167,7 @@ public class GameService {
     }
 
     @Transactional
-    public void selectVictoriousAnswer(SelectVictoriousAnswerDto selectVictoriousAnswer,
-                                       AuthorizationDto authorizationDto) {
+    public void selectVictoriousAnswer(SelectVictoriousAnswerDto selectVictoriousAnswer, String username) {
         Game game = getGameById(selectVictoriousAnswer.getGameId());
 
         if (!game.getState().equals(GameState.SELECTING_VICTORIOUS_ANSWER)) {
@@ -178,7 +175,7 @@ public class GameService {
         }
 
         Player currentPlayer = game.getCurrentPlayer();
-        if (currentPlayer == null || !currentPlayer.getUsername().equals(authorizationDto.getUsername())) {
+        if (currentPlayer == null || !currentPlayer.getUsername().equals(username)) {
             throw new BusinessException("Player null or not the host");
         }
 
@@ -307,8 +304,11 @@ public class GameService {
 
     @Transactional
     public Player preparePlayer(String username) {
-        Player player = playerRepository.findByUsername(username)
-                .orElseThrow(() -> new BusinessException("Player not found"));
+        Optional<Player> player = playerRepository.findByUsername(username);
+
+        if (player.isEmpty()) {
+            return playerRepository.save(new Player().setUsername(username).setScore(0));
+        }
 
         playerRepository.getGameIdByUsername(username)
                 .ifPresent(gameId -> repository.findById(gameId)
@@ -316,11 +316,12 @@ public class GameService {
                         .removeIf(p -> p.getUsername().equals(username))
                 );
 
-        playerRepository.removeCardsByUsername(player.getUsername());
-        player.setCards(null);
-        player.setSelectedAnswer(null);
-        player.setScore(0);
-        return playerRepository.save(player);
+        Player foundPlayer = player.get();
+        playerRepository.removeCardsByUsername(username);
+        foundPlayer.setCards(null);
+        foundPlayer.setSelectedAnswer(null);
+        foundPlayer.setScore(0);
+        return playerRepository.save(foundPlayer);
     }
 
     private Game getGameById(Long gameId) {
