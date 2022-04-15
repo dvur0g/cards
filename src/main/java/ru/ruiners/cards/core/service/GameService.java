@@ -210,6 +210,13 @@ public class GameService {
         game.setVictoriousAnswer(null);
         repository.save(game);
 
+        game.getPlayers().forEach(p -> {
+            if (p.getCards().size() < MAX_CARDS_AMOUNT) {
+                p.getCards().add(getRandomCard());
+                playerRepository.save(p);
+            }
+        });
+
         GameDto result = mapper.toDto(game, PROCESSING_DELAY);
         simpMessagingTemplate.convertAndSend(TOPIC + result.getId(), result);
 
@@ -249,13 +256,6 @@ public class GameService {
 
         game.setState(GameState.SELECTING_VICTORIOUS_ANSWER);
         repository.save(game);
-
-        game.getPlayers().forEach(p -> {
-            if (p.getCards().size() < MAX_CARDS_AMOUNT) {
-                p.getCards().add(getRandomCard());
-                playerRepository.save(p);
-            }
-        });
 
         GameDto result = mapper.toDto(game, SELECTING_ANSWERS_DELAY);
         simpMessagingTemplate.convertAndSend(TOPIC + result.getId(), result);
