@@ -2,7 +2,6 @@ package ru.ruiners.cards.suggestion.model;
 
 import lombok.Data;
 import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
