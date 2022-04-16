@@ -2,20 +2,14 @@ package ru.ruiners.cards.controller;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.keycloak.KeycloakPrincipal;
-import org.keycloak.KeycloakSecurityContext;
-import org.keycloak.representations.AccessToken;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-import ru.ruiners.cards.controller.dto.*;
+import ru.ruiners.cards.controller.dto.game.*;
 import ru.ruiners.cards.core.service.GameService;
 import ru.ruiners.cards.service.AuthenticationService;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @Slf4j

@@ -37,7 +37,7 @@ create table cards.question
         constraint question_pkey
             primary key,
     text varchar(255),
-    type varchar(255) not null
+    type varchar(255) not null default 'OK'
 );
 
 create table cards.game

@@ -3,8 +3,8 @@ package ru.ruiners.cards.core.mapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
-import ru.ruiners.cards.controller.dto.GameDto;
-import ru.ruiners.cards.controller.dto.TimerDto;
+import ru.ruiners.cards.controller.dto.game.GameDto;
+import ru.ruiners.cards.controller.dto.game.TimerDto;
 import ru.ruiners.cards.core.model.Game;
 
 @Mapper(componentModel = "spring", uses = {QuestionMapper.class, PlayerMapper.class})

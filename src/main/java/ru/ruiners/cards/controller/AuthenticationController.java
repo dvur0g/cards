@@ -1,11 +1,12 @@
 package ru.ruiners.cards.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ru.ruiners.cards.controller.dto.MeDto;
-import ru.ruiners.cards.controller.dto.ResponseDto;
+import ru.ruiners.cards.controller.dto.authentication.MeDto;
+import ru.ruiners.cards.controller.dto.authentication.ResponseDto;
 import ru.ruiners.cards.service.AuthenticationService;
 
 import javax.servlet.ServletException;
@@ -19,14 +20,14 @@ public class AuthenticationController {
 
     @GetMapping(path = "/me")
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
-    public MeDto me() {
-        return new MeDto().setUsername(authenticationService.getUsername());
+    public ResponseEntity<MeDto> me() {
+        return ResponseEntity.ok(authenticationService.getMe());
     }
 
     @GetMapping(path = "/logout")
-    public ResponseDto logout(HttpServletRequest request) throws ServletException {
+    public ResponseEntity<ResponseDto> logout(HttpServletRequest request) throws ServletException {
         request.logout();
-        return new ResponseDto().setMessage("Success");
+        return ResponseEntity.ok(new ResponseDto().setMessage("Success"));
     }
 
 }

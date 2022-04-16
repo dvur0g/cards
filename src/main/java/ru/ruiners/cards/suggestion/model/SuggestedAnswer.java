@@ -1,37 +1,39 @@
-package ru.ruiners.cards.core.model;
+package ru.ruiners.cards.suggestion.model;
 
 import lombok.Data;
-import ru.ruiners.cards.core.model.enums.CensorType;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
 @Data
-public class Card {
+@SQLDelete(sql = "update suggested_answer set deleted = true where id = ?")
+public class SuggestedAnswer {
 
     @Id
     @GeneratedValue(
             strategy = GenerationType.SEQUENCE,
-            generator = "seq_card"
+            generator = "seq_suggested_answer"
     )
     @SequenceGenerator(
-            name = "seq_card",
+            name = "seq_suggested_answer",
             allocationSize = 1
     )
     private Long id;
 
+    @Column(nullable = false, unique = true)
     private String text;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private CensorType type = CensorType.OK;
 
     @Column(nullable = false)
     private LocalDateTime date;
 
     @Column(nullable = false)
     private String username;
+
+    @Column(nullable = false)
+    private Boolean deleted;
 
     @Override
     public String toString() {

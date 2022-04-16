@@ -1,4 +1,4 @@
-package ru.ruiners.cards.controller.dto;
+package ru.ruiners.cards.controller.dto.game;
 
 import lombok.Data;
 import ru.ruiners.cards.core.model.enums.GameState;
