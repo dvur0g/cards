@@ -87,7 +87,6 @@ body {
     left: 35%;
     z-index: 1;
     outline: #666 solid 7px;
-
 }
 
 .div-table {
@@ -98,6 +97,7 @@ body {
     /*border: 1px solid #666666;*/
     margin: auto;
     border-spacing: 15px; /* cellspacing:poor IE support for  this */
+    filter: blur(5px);
 }
 
 .div-table-row {

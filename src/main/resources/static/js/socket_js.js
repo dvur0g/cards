@@ -69,6 +69,8 @@ function createGame() {
             console.log(error);
         }
     })
+
+    unblur('playingArea')
 }
 
 function connectToGame(gameId) {
@@ -88,6 +90,8 @@ function connectToGame(gameId) {
             console.log(error);
         }
     })
+
+    unblur('playingArea')
 }
 
 function getAvailableGames() {

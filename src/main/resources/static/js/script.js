@@ -132,6 +132,7 @@ function selectAnswer(cardSelectedIndex) {
 
 function showMenu() {
     get("menu").style.visibility = "visible";
+    blur('playingArea')
 }
 
 function hide(elementId) {
