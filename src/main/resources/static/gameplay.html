@@ -11,6 +11,7 @@
     <link crossorigin="anonymous" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
           integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" rel="stylesheet">
     <link href="css/style.css" rel="stylesheet">
+    <link href="css/style_admin.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.4.0/sockjs.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
@@ -18,6 +19,41 @@
 
 <body>
 
+        <div id="admin-panel">
+            <div onclick="hideAdminPanel()">Выйти</div>
+            <div>
+                <div onclick="showAnswers()">Показать ответы</div>
+            </div>
+            <div>
+                <div onclick="showQuestions()">Показать вопросы</div>
+            </div>
+            <div>
+                <div onclick="showSuggestedAnswers()">Показать предложенные ответы</div>
+            </div>
+            <div>
+                <div onclick="showSuggestedQuestions()">Показать предложенные вопросы</div>
+            </div>
+
+            <div>
+                <div onclick="filterWithoutDeleted()">Текущие</div>
+            </div>
+            <div>
+                <div onclick="filterDeleted()">Удалённые</div>
+            </div>
+
+            <label>
+                Страница номер:
+                <input id="page">
+            </label>
+            <label>
+                Кол-во записей на странице:
+                <input id="count">
+            </label>
+
+            <div id = "admin-list">
+            </div>
+
+        </div>
 
         <div id="menu" class="div-auth">
             <div class="div-menu-table-row">
@@ -52,10 +88,7 @@
                         Админка
                         <br><br>
                         <div class="div-table-col-left">
-                            <div class="div-menu-table-col" onclick="showAnswers()">Показать вопросы</div>
-                        </div>
-                        <div class="div-table-col-right">
-                            <div class="div-menu-table-col" onclick="showQuestions()">Показать ответы</div>
+                            <div class="div-menu-table-col" onclick="showAdminPanel()">Показать вопросы/ответы</div>
                         </div>
                     </div>
                     <div class="div-menu-table-row">
@@ -225,6 +258,7 @@
         <script src="js/script.js"></script>
         <script src="js/socket_js.js"></script>
         <script src="js/style_script.js"></script>
+        <script src="js/admin_panel.js"></script>
     </body>
 
 </html>

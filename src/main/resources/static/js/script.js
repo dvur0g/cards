@@ -163,6 +163,14 @@ function startTimer(duration) {
     }, 1000);
 }
 
+function showAdminPanel() {
+    get("admin-panel").style.visibility = "visible"
+}
+
+function hideAdminPanel() {
+    get("admin-panel").style.visibility = "hidden"
+}
+
 function clear(elementId) {
     get(elementId).innerHTML = "";
 }

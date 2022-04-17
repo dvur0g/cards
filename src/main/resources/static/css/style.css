@@ -83,10 +83,10 @@ body {
 
 .div-auth {
     position: absolute;
-    top: 35%;
+    top: 25%;
     left: 35%;
-    z-index: 1;
-    outline: #666 solid 7px;
+    z-index: 2;
+    outline: #666 solid 5px;
 }
 
 .div-table {
