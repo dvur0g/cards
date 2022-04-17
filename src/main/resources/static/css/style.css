@@ -173,6 +173,14 @@ body {
     outline: solid;
 }
 
+#div-admin {
+    visibility: hidden;
+}
+
+.div-suggest {
+    width: 100%;
+}
+
 .hidden {
     visibility: hidden;
 }

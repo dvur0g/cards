@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.ruiners.cards.controller.dto.authentication.MeDto;
 import ru.ruiners.cards.controller.dto.authentication.ResponseDto;
-import ru.ruiners.cards.service.AuthenticationService;
+import ru.ruiners.cards.security.service.AuthenticationService;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;

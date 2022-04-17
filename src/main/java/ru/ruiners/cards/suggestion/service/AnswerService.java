@@ -8,8 +8,9 @@ import ru.ruiners.cards.controller.dto.game.CardDto;
 import ru.ruiners.cards.controller.dto.suggestion.SuggestedAnswerDto;
 import ru.ruiners.cards.core.mapper.CardMapper;
 import ru.ruiners.cards.core.model.Card;
+import ru.ruiners.cards.core.model.enums.CensorType;
 import ru.ruiners.cards.core.repository.CardRepository;
-import ru.ruiners.cards.service.AuthenticationService;
+import ru.ruiners.cards.security.service.AuthenticationService;
 import ru.ruiners.cards.suggestion.mapper.SuggestedAnswerMapper;
 import ru.ruiners.cards.suggestion.model.SuggestedAnswer;
 import ru.ruiners.cards.suggestion.repository.SuggestedAnswerRepository;
@@ -40,6 +41,7 @@ public class AnswerService {
 
         suggestedAnswer.setUsername(authenticationService.getUsername());
         suggestedAnswer.setDate(LocalDateTime.now());
+        suggestedAnswer.setDeleted(false);
         suggestedAnswerRepository.save(suggestedAnswer);
     }
 
@@ -47,8 +49,7 @@ public class AnswerService {
         SuggestedAnswer suggestedAnswer = suggestedAnswerRepository.findById(id)
                 .orElseThrow(() -> new BusinessException("Suggested Answer not found"));
 
-        Card card = suggestedAnswerMapper.toCard(suggestedAnswer);
-        repository.save(card);
+        add(suggestedAnswerMapper.toCard(suggestedAnswer));
 
         suggestedAnswer.setDeleted(true);
         suggestedAnswerRepository.save(suggestedAnswer);
@@ -67,14 +68,19 @@ public class AnswerService {
     }
 
     public void addAnswer(CardDto cardDto) {
-        Card card = cardMapper.toCard(cardDto);
-        card.setDate(LocalDateTime.now());
-        card.setUsername(authenticationService.getUsername());
-        repository.save(card);
+        add(cardMapper.toCard(cardDto));
     }
 
     public void deleteAnswer(long id) {
         repository.deleteById(id);
     }
-    
+
+    private void add(Card card) {
+        card.setDate(LocalDateTime.now());
+        if (card.getUsername() == null) {
+            card.setUsername(authenticationService.getUsername());
+        }
+        card.setType(CensorType.OK);
+        repository.save(card);
+    }
 }

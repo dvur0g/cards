@@ -2,6 +2,7 @@ const url = 'http://localhost:8080';
 let stompClient;
 
 let username = null;
+let roles = null
 let gameId = null;
 
 document.addEventListener("DOMContentLoaded", function() {
@@ -10,7 +11,14 @@ document.addEventListener("DOMContentLoaded", function() {
         type: 'GET',
         success: function (me) {
             username = me.username
+            roles = new Set(me.roles)
+
             get("currentUsername").innerHTML = username
+            if (roles.has("ADMIN")) {
+                get("div-admin").style.visibility = "visible"
+            } else {
+                get("div-admin").style.visibility = "hidden"
+            }
         },
         error: function (error) {
             console.log(error);
@@ -137,4 +145,96 @@ function postSelectAnswer(victoriousPlayerId) {
             console.log(error);
         }
     })
+}
+
+function suggestAnswer() {
+    const textArea = document.getElementById("suggest-answer")
+    const suggestedAnswerText = textArea.value
+    if (isEmpty(suggestedAnswerText, "Введите текст карты!")) {
+        return
+    }
+
+    $.ajax({
+        url: url + "/answer/suggest",
+        type: 'POST',
+        dataType: "json",
+        contentType: "application/json",
+        data: JSON.stringify({
+            "text": suggestedAnswerText
+        }),
+        error: function (error) {
+            console.log(error);
+        }
+    })
+
+    textArea.value = ""
+}
+
+function suggestQuestion() {
+    const textArea = document.getElementById("suggest-question")
+    const suggestedQuestionText = textArea.value
+    if (isEmpty(suggestedQuestionText, "Введите текст вопроса!")) {
+        return
+    }
+
+    $.ajax({
+        url: url + "/question/suggest",
+        type: 'POST',
+        dataType: "json",
+        contentType: "application/json",
+        data: JSON.stringify({
+            "text": suggestedQuestionText
+        }),
+        error: function (error) {
+            console.log(error);
+        }
+    })
+
+    textArea.value = ""
+}
+
+function addAnswer() {
+    const textArea = document.getElementById("add-answer")
+    const addAnswerText = textArea.value
+    if (isEmpty(addAnswerText, "Введите текст карты!")) {
+        return
+    }
+
+    $.ajax({
+        url: url + "/answer/add",
+        type: 'POST',
+        dataType: "json",
+        contentType: "application/json",
+        data: JSON.stringify({
+            "text": addAnswerText
+        }),
+        error: function (error) {
+            console.log(error);
+        }
+    })
+
+    textArea.value = ""
+}
+
+function addQuestion() {
+    const textArea = document.getElementById("add-question")
+    const addQuestionText = textArea.value
+    if (isEmpty(addQuestionText, "Введите текст вопроса!")) {
+        return
+    }
+
+    $.ajax({
+        url: url + "/question/add",
+        type: 'POST',
+        dataType: "json",
+        contentType: "application/json",
+        data: JSON.stringify({
+            "text": addQuestionText
+        }),
+        error: function (error) {
+            console.log(error);
+        }
+    })
+
+    textArea.value = ""
 }

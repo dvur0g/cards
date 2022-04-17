@@ -18,19 +18,55 @@
 
 <body>
 
+
         <div id="menu" class="div-auth">
             <div class="div-menu-table-row">
-                <div class="div-table-col-left">Ак ак играть?
-                    <br><br> да <br><br> вот <br><br> так <br><br> вот <br><br>
+                <div class="div-table-row">
+                    <div class="div-table-col-left">Ак ак играть?
+                        <br><br> да <br><br> вот <br><br> так <br><br> вот <br><br>
+                    </div>
+                    <div class="div-menu-table-col-right">
+                        <div class="div-menu-table-row">
+                            <div class="div-menu-table-col" onclick="createGame()">Создать новую игру</div>
+                        </div>
+                        <div class="div-menu-table-row">
+                            <div class="div-menu-table-col" onclick="getAvailableGames()">Обновить список игр</div>
+                        </div>
+                        <div id = "gamesList" class="div-menu-table-row">
+                        </div>
+                    </div>
                 </div>
-                <div class="div-menu-table-col-right">
+                <div class="div-table-row">
+                    <div class="div-suggest">
+                        <label for="suggest-answer">Текст карты:</label><input type="text" id="suggest-answer" class="input-suggest">
+                        <div class="div-menu-table-col" onclick="suggestAnswer()">Предложить карту</div>
+                    </div>
+                    <div class="div-suggest">
+                        <label for="suggest-question">Текст вопроса:</label><input type="text" id="suggest-question" class="input-suggest">
+                        <div class="div-menu-table-col" onclick="suggestQuestion()">Предложить вопрос</div>
+                    </div>
+                </div>
+                <div class="div-table-row" id="div-admin">
                     <div class="div-menu-table-row">
-                        <div class="div-menu-table-col" onclick="createGame()">Создать новую игру</div>
+                        <br>
+                        Админка
+                        <br><br>
+                        <div class="div-table-col-left">
+                            <div class="div-menu-table-col" onclick="showAnswers()">Показать вопросы</div>
+                        </div>
+                        <div class="div-table-col-right">
+                            <div class="div-menu-table-col" onclick="showQuestions()">Показать ответы</div>
+                        </div>
                     </div>
                     <div class="div-menu-table-row">
-                        <div class="div-menu-table-col" onclick="getAvailableGames()">Обновить список игр</div>
-                    </div>
-                    <div id = "gamesList" class="div-menu-table-row">
+                        <div class="div-add">
+                            <label for="add-answer">Текст карты:</label><input type="text" id="add-answer" class="input-add">
+                            <div class="div-menu-table-col" onclick="addAnswer()">Добавить карту</div>
+                        </div>
+                        <div class="div-add">
+                            <label for="add-question">Текст вопроса:</label><input type="text" id="add-question" class="input-add">
+                            <div class="div-menu-table-col" onclick="addQuestion()">Добавить вопрос</div>
+                        </div>
                     </div>
                 </div>
             </div>

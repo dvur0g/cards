@@ -8,8 +8,9 @@ import ru.ruiners.cards.controller.dto.game.QuestionDto;
 import ru.ruiners.cards.controller.dto.suggestion.SuggestedQuestionDto;
 import ru.ruiners.cards.core.mapper.QuestionMapper;
 import ru.ruiners.cards.core.model.Question;
+import ru.ruiners.cards.core.model.enums.CensorType;
 import ru.ruiners.cards.core.repository.QuestionRepository;
-import ru.ruiners.cards.service.AuthenticationService;
+import ru.ruiners.cards.security.service.AuthenticationService;
 import ru.ruiners.cards.suggestion.mapper.SuggestedQuestionMapper;
 import ru.ruiners.cards.suggestion.model.SuggestedQuestion;
 import ru.ruiners.cards.suggestion.repository.SuggestedQuestionRepository;
@@ -40,6 +41,7 @@ public class QuestionService {
 
         suggestedQuestion.setUsername(authenticationService.getUsername());
         suggestedQuestion.setDate(LocalDateTime.now());
+        suggestedQuestion.setDeleted(false);
         suggestedQuestionRepository.save(suggestedQuestion);
     }
 
@@ -47,8 +49,7 @@ public class QuestionService {
         SuggestedQuestion suggestedQuestion = suggestedQuestionRepository.findById(id)
                 .orElseThrow(() -> new BusinessException("Suggested question not found"));
 
-        Question question = suggestedQuestionMapper.toQuestion(suggestedQuestion);
-        repository.save(question);
+        add(suggestedQuestionMapper.toQuestion(suggestedQuestion));
 
         suggestedQuestion.setDeleted(true);
         suggestedQuestionRepository.save(suggestedQuestion);
@@ -67,14 +68,20 @@ public class QuestionService {
     }
 
     public void addQuestion(QuestionDto questionDto) {
-        Question question = questionMapper.toQuestion(questionDto);
-        question.setDate(LocalDateTime.now());
-        question.setUsername(authenticationService.getUsername());
-        repository.save(question);
+        add(questionMapper.toQuestion(questionDto));
     }
 
     public void deleteQuestion(long id) {
         repository.deleteById(id);
+    }
+
+    private void add(Question question) {
+        question.setDate(LocalDateTime.now());
+        if (question.getUsername() == null) {
+            question.setUsername(authenticationService.getUsername());
+        }
+        question.setType(CensorType.OK);
+        repository.save(question);
     }
 
 }

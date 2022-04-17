@@ -7,7 +7,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ru.ruiners.cards.controller.dto.game.*;
 import ru.ruiners.cards.core.service.GameService;
-import ru.ruiners.cards.service.AuthenticationService;
+import ru.ruiners.cards.security.service.AuthenticationService;
 
 import java.util.List;
 
