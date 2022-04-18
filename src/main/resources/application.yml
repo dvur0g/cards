@@ -8,14 +8,14 @@ spring:
     hikari:
       connection-timeout: 20000
       maximum-pool-size: 5
-    url: jdbc:postgresql://localhost:5432/cards?currentSchema=cards
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:5432/cards?currentSchema=cards
     username: postgres
     password: postgres
   liquibase:
     change-log: classpath:db/changelog.yml
 
 keycloak:
-  auth-server-url: http://localhost:8484/auth
-  realm: cards_realm
-  resource: client
+  auth-server-url: http://${KEYCLOAK_HOST:localhost}:${KEYCLOAK_PORT:8484}/auth
+  realm: ${KEYCLOAK_REALM:cards_realm}
+  resource: ${KEYCLOAK_CLIENT:client}
   public-client: true

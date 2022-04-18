@@ -79,6 +79,8 @@ function createGame() {
     })
 
     unblur('playingArea')
+    hide('menu')
+    hide('div-admin')
 }
 
 function connectToGame(gameId) {
