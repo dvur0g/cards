@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 8181
 
 spring:
   application:
@@ -15,7 +15,11 @@ spring:
     change-log: classpath:db/changelog.yml
 
 keycloak:
-  auth-server-url: http://${KEYCLOAK_HOST:localhost}:${KEYCLOAK_PORT:8484}/auth
-  realm: ${KEYCLOAK_REALM:cards_realm}
-  resource: ${KEYCLOAK_CLIENT:client}
+  auth-server-url: http://${KEYCLOAK_HOST:localhost}:8080/auth
+#  proxy-url: http://localhost:8080/auth
+  realm: cards_realm
+  resource: client
   public-client: true
+  bearer-only: true
+  credentials:
+    secret: nRvJMqMdD1yk4H5m3L5b8RB6PONZ09ZR
