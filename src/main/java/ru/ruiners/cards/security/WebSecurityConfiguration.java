@@ -29,7 +29,7 @@ public class WebSecurityConfiguration extends KeycloakWebSecurityConfigurerAdapt
                 .allowedOriginPatterns("*")
                 .allowedHeaders("*")
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "HEAD")
-                .maxAge(-1)   // add maxAge
+                .maxAge(-1)
                 .allowCredentials(false);
     }
 
@@ -57,6 +57,7 @@ public class WebSecurityConfiguration extends KeycloakWebSecurityConfigurerAdapt
                 .csrf().disable()
                 .cors()
                 .and().authorizeRequests().antMatchers("/auth/login").permitAll()
+                .and().authorizeRequests().antMatchers("/auth/register").permitAll()
                 .and().authorizeRequests().antMatchers("/page/**").permitAll()
                 .anyRequest().fullyAuthenticated();
     }

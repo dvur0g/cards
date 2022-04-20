@@ -19,6 +19,6 @@ keycloak:
   realm: cards_realm
   resource: client
   credentials:
-    secret: sL0o2pBtzGwiX1k11R08yMnVFTgjHctY
+    secret: k1S0Iy2Zsrxg2ZbubwQnIxDyL7WcTgxO
   public-client: true
   bearer-only: true
