@@ -1,12 +1,8 @@
 const COOKIE_NAME = "CARDS_COOKIE";
 
-function login() {
+function doLogin() {
     const username = get('login').value;
     const password = get('password').value;
-
-    if (isEmpty(username, 'Введите логин!') || isEmpty(password, 'Введите пароль!')) {
-        return
-    }
 
     $.ajax({
         url: url + "/auth/login",
@@ -51,7 +47,9 @@ function setCookie(accessToken) {
 function getCookie() {
     const value = `; ${document.cookie}`;
     const parts = value.split(`; ${COOKIE_NAME}=`);
-    if (parts.length === 2) return  "Bearer " + parts.pop().split(';').shift();
+    if (parts.length === 2) {
+        return  "Bearer " + parts.pop().split(';').shift();
+    }
 }
 
 function eraseCookie() {
