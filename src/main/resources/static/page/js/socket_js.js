@@ -7,8 +7,11 @@ let gameId = null;
 
 document.addEventListener("DOMContentLoaded", function() {
     $.ajax({
-        url: url + "/me",
+        url: url + "/auth/me",
         type: 'GET',
+        headers: {
+            "Authorization": getCookie()
+        },
         success: function (me) {
             username = me.username
             roles = new Set(me.roles)
@@ -30,7 +33,10 @@ window.onbeforeunload = disconnectFromGameBeforeClosingPage;
 function disconnectFromGameBeforeClosingPage() {
     $.ajax({
         url: url + "/game/disconnect",
-        type: 'POST'
+        type: 'POST',
+        headers: {
+            "Authorization": getCookie()
+        },
     });
     stompClient.disconnect();
 }
@@ -60,7 +66,10 @@ function disconnectFromGame() {
 
     $.ajax({
         url: url + "/game/disconnect",
-        type: 'POST'
+        type: 'POST',
+        headers: {
+            "Authorization": getCookie()
+        },
     });
     stompClient.disconnect();
 }
@@ -69,6 +78,9 @@ function createGame() {
     $.ajax({
         url: url + "/game/create",
         type: 'POST',
+        headers: {
+            "Authorization": getCookie()
+        },
         success: function (game) {
             connectToSocket(game);
             alert("Your created a game. Game id is: " + game.id);
@@ -87,6 +99,9 @@ function connectToGame(gameId) {
     $.ajax({
         url: url + "/game/connect",
         type: 'POST',
+        headers: {
+            "Authorization": getCookie()
+        },
         dataType: "json",
         contentType: "application/json",
         data: JSON.stringify({
@@ -108,6 +123,9 @@ function getAvailableGames() {
     $.ajax({
         url: url + "/game/list",
         type: 'GET',
+        headers: {
+            "Authorization": getCookie()
+        },
         success: function (gamesList) {
             showAvailableGamesList(gamesList)
         },
@@ -121,6 +139,9 @@ function postSelectCard(cardId) {
     $.ajax({
         url: url + "/game/select-card",
         type: 'POST',
+        headers: {
+            "Authorization": getCookie()
+        },
         dataType: "json",
         contentType: "application/json",
         data: JSON.stringify({
@@ -137,6 +158,9 @@ function postSelectAnswer(victoriousPlayerId) {
     $.ajax({
         url: url + "/game/select-victorious-answer",
         type: 'POST',
+        headers: {
+            "Authorization": getCookie()
+        },
         dataType: "json",
         contentType: "application/json",
         data: JSON.stringify({
@@ -159,6 +183,9 @@ function suggestAnswer() {
     $.ajax({
         url: url + "/answer/suggest",
         type: 'POST',
+        headers: {
+            "Authorization": getCookie()
+        },
         dataType: "json",
         contentType: "application/json",
         data: JSON.stringify({
@@ -182,6 +209,9 @@ function suggestQuestion() {
     $.ajax({
         url: url + "/question/suggest",
         type: 'POST',
+        headers: {
+            "Authorization": getCookie()
+        },
         dataType: "json",
         contentType: "application/json",
         data: JSON.stringify({
@@ -205,6 +235,9 @@ function addAnswer() {
     $.ajax({
         url: url + "/answer/add",
         type: 'POST',
+        headers: {
+            "Authorization": getCookie()
+        },
         dataType: "json",
         contentType: "application/json",
         data: JSON.stringify({
@@ -228,6 +261,9 @@ function addQuestion() {
     $.ajax({
         url: url + "/question/add",
         type: 'POST',
+        headers: {
+            "Authorization": getCookie()
+        },
         dataType: "json",
         contentType: "application/json",
         data: JSON.stringify({

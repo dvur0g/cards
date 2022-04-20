@@ -11,6 +11,9 @@ function showAnswers() {
     $.ajax({
         url: url + "/answer/list?page=" + page + "&count=" + count,
         type: 'GET',
+        headers: {
+            "Authorization": getCookie()
+        },
         success: function (cardList) {
             const list = document.createElement('ul');
 
@@ -26,6 +29,9 @@ function showAnswers() {
                     $.ajax({
                         url: url + "/answer/delete/" + cardList[i].id,
                         type: 'DELETE',
+                        headers: {
+                            "Authorization": getCookie()
+                        },
                         success: function () {
                             showAnswers();
                         },
@@ -59,6 +65,9 @@ function showQuestions() {
     $.ajax({
         url: url + "/question/list?page=" + page + "&count=" + count,
         type: 'GET',
+        headers: {
+            "Authorization": getCookie()
+        },
         success: function (cardList) {
             const list = document.createElement('ul');
 
@@ -74,6 +83,9 @@ function showQuestions() {
                     $.ajax({
                         url: url + "/question/delete/" + cardList[i].id,
                         type: 'DELETE',
+                        headers: {
+                            "Authorization": getCookie()
+                        },
                         success: function () {
                             showQuestions();
                         },
@@ -107,6 +119,9 @@ function showSuggestedAnswers() {
     $.ajax({
         url: url + "/answer/suggested/list?page=" + page + "&count=" + count + "&isDeleted=" + isDeleted,
         type: 'GET',
+        headers: {
+            "Authorization": getCookie()
+        },
         success: function (cardList) {
             const list = document.createElement('ul');
 
@@ -122,6 +137,9 @@ function showSuggestedAnswers() {
                     $.ajax({
                         url: url + "/answer/suggest/approve/" + cardList[i].id,
                         type: 'POST',
+                        headers: {
+                            "Authorization": getCookie()
+                        },
                         success: function () {
                             showSuggestedAnswers();
                         },
@@ -137,6 +155,9 @@ function showSuggestedAnswers() {
                     $.ajax({
                         url: url + "/answer/suggest/disapprove/" + cardList[i].id,
                         type: 'POST',
+                        headers: {
+                            "Authorization": getCookie()
+                        },
                         success: function () {
                             showSuggestedAnswers();
                         },
@@ -171,6 +192,9 @@ function showSuggestedQuestions() {
     $.ajax({
         url: url + "/question/suggested/list?page=" + page + "&count=" + count + "&isDeleted=" + isDeleted,
         type: 'GET',
+        headers: {
+            "Authorization": getCookie()
+        },
         success: function (questionList) {
             const list = document.createElement('ul');
 
@@ -186,6 +210,9 @@ function showSuggestedQuestions() {
                     $.ajax({
                         url: url + "/question/suggest/approve/" + questionList[i].id,
                         type: 'POST',
+                        headers: {
+                            "Authorization": getCookie()
+                        },
                         success: function () {
                             showSuggestedQuestions();
                         },
@@ -201,6 +228,9 @@ function showSuggestedQuestions() {
                     $.ajax({
                         url: url + "/question/suggest/disapprove/" + questionList[i].id,
                         type: 'POST',
+                        headers: {
+                            "Authorization": getCookie()
+                        },
                         success: function () {
                             showSuggestedQuestions();
                         },

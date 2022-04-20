@@ -14,6 +14,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.authority.mapping.SimpleAuthorityMapper;
 import org.springframework.security.web.authentication.session.NullAuthenticatedSessionStrategy;
 import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -54,9 +55,15 @@ public class WebSecurityConfiguration extends KeycloakWebSecurityConfigurerAdapt
         super.configure(http);
         http
                 .csrf().disable()
-                .cors().and()
-                .authorizeRequests()
+                .cors()
+                .and().authorizeRequests().antMatchers("/auth/login").permitAll()
+                .and().authorizeRequests().antMatchers("/page/**").permitAll()
                 .anyRequest().fullyAuthenticated();
+    }
+
+    @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
     }
 
 }

@@ -16,10 +16,9 @@ spring:
 
 keycloak:
   auth-server-url: http://${KEYCLOAK_HOST:localhost}:8080/auth
-#  proxy-url: http://localhost:8080/auth
   realm: cards_realm
   resource: client
+  credentials:
+    secret: sL0o2pBtzGwiX1k11R08yMnVFTgjHctY
   public-client: true
   bearer-only: true
-  credentials:
-    secret: nRvJMqMdD1yk4H5m3L5b8RB6PONZ09ZR
