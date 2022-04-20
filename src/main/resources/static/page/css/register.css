@@ -17,9 +17,9 @@ body{
     align-items: center;
 }
 .box{
-    padding-top: 10%;
+    padding-top: 3%;
     width: 350px;
-    height: 450px;
+    height: 630px;
     transform: scale(0.9);
 }
 .title{
@@ -30,7 +30,7 @@ body{
 }
 .box_login{
     width: 350px;
-    height: 260px;
+    height: 480px;
     background-color: black;
     padding-top: 5px;
 }
@@ -82,7 +82,7 @@ body{
     color: rgb(144, 144, 144);
     font-size: 18px;
     margin: 5px auto;
-    width: 134px;
+    width: 151px;
     height: 20px;
     display: flex;
     letter-spacing: 1px;
