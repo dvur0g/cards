@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>login</title>
+    <link rel="stylesheet" href="css/gameMenu.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.4.0/sockjs.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+</head>
+<body>
+    <div class="box">
+        <div class="box-big">
+            <h1 class="title">cards.io</h1>
+            <div class="box-content-left">
+                <h3 class="list-game">Список игр:</h3>
+                <div class="new-game-or-connect-button" onclick="toggleNewGame()">+  Создать игру</div>
+                <ul id="gamesList">
+                </ul>
+            </div>
+            <div class="box-content-center">
+                <div id="box-new-game">
+                    <div class="info-game">Новая игра</div>
+
+                    <label for="gameNameInput" class="your-card">Название игры:</label><br>
+                    <input type="text" id="gameNameInput" value=""><br>
+                    <button id="newGameButton" class="your-button" onclick="createGame()">СОЗДАТЬ ИГРУ</button>
+                </div>
+
+                <div id="box-connect">
+                    <div class="game-info">Информация об игре</div>
+                    <div class="game-round">Раунд: <div id="gameRoundNumber">5</div></div>
+                    <div class="players">Игроки:</div>
+                    <ul id="playerScoreList">
+                    </ul>
+                    <button class="button-connect" onclick="connectToGame()">ПРИСОЕДИНИТЬСЯ</button>
+                </div>
+            </div>
+
+            <div class="box-content-right">
+                <div class="how-play">Как играть?</div>
+                <div class="instruction">
+                    1. Каждый раунд разыгрывается вопрос. <br><br>
+                    2. Из своих карт, вам нужно выбрать самый смешной ответ.<br><br>
+                    3. Ведущий выбирает из предложенных вариантов самый смешной на его взгляд. Этот игрок получает 1 очко.<br><br>
+                    4. Далее ведущим становится следующий игрок.<br><br>
+                    5. Игрок, набравший 10 очков, побеждает.
+                </div>
+                <label for="suggestCardText" class="your-card">Предложите карту:</label><br>
+                <input type="text" id="suggestCardText" value=""><br>
+                <button id="suggestCardButton" class="your-button" onclick="suggestAnswer()">ПРЕДЛОЖИТЬ</button>
+
+
+                <label for="suggestedQuestionText" class="your-question">Предложите вопрос:</label><br>
+                <textarea id="suggestedQuestionText" rows="10" cols="5"></textarea><br>
+                <button id="suggestQuestionButton" class="your-button" onclick="suggestQuestion()">ПРЕДЛОЖИТЬ</button>
+
+            </div>
+        </div>
+    </div>
+
+
+    <script src="js/script.js"></script>
+    <script src="js/socket_js.js"></script>
+    <script src="js/game_menu.js"></script>
+    <script src="js/login.js"></script>
+    <script src="js/redirect.js"></script>
+</body>
+</html>
+
+

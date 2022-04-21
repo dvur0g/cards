@@ -17,7 +17,7 @@ function doLogin() {
             setCookie(response.access_token)
 
             console.log('accessToken cookie: ' + getCookie())
-            window.location.href = '/page/gameplay.html'
+            window.location.href = '/page/gameMenu.html'
         },
         error: function (error) {
             console.log(error);

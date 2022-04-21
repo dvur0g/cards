@@ -9,8 +9,10 @@ import java.util.List;
 public class GameDto {
 
     private Long id;
+    private String name;
     private Integer minPlayersAmount;
     private GameState state;
+    private int round;
     private PlayerDto currentPlayer;
     private CardDto victoriousAnswer;
     private List<PlayerDto> players;

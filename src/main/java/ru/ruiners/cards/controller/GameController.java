@@ -22,11 +22,11 @@ public class GameController {
 
     @PostMapping("/create")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<GameDto> create() {
+    public ResponseEntity<GameDto> create(@RequestBody CreateGameDto dto) {
         String username = authenticationService.getUsername();
         log.info("create game request from: {}", username);
 
-        GameDto game = gameService.createGame(username);
+        GameDto game = gameService.createGame(username, dto.getName());
         log.info("created game: {}", game);
 
         return ResponseEntity.ok(game);

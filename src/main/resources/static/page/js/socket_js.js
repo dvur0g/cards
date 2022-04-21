@@ -41,26 +41,6 @@ function disconnectFromGameBeforeClosingPage() {
     stompClient.disconnect();
 }
 
-function connectToSocket(game) {
-    console.log("connecting to the game " + game.id);
-    
-    let socket = new SockJS(url + "/gameplay");
-    stompClient = Stomp.over(socket);
-    stompClient.connect({}, function (frame) {
-        console.log("connected to the frame: " + frame);
-        stompClient.subscribe("/topic/game-progress/" + game.id, function (response) {
-            let data = JSON.parse(response.body);
-
-            update(data);
-        })
-    })
-
-    get("menu").style.visibility = "hidden";
-    gameId = game.id;
-
-    update(game);
-}
-
 function disconnectFromGame() {
     console.log("disconnect from game " + username);
 
@@ -72,67 +52,6 @@ function disconnectFromGame() {
         },
     });
     stompClient.disconnect();
-}
-
-function createGame() {
-    $.ajax({
-        url: url + "/game/create",
-        type: 'POST',
-        headers: {
-            "Authorization": getCookie()
-        },
-        success: function (game) {
-            connectToSocket(game);
-            alert("Your created a game. Game id is: " + game.id);
-            },
-        error: function (error) {
-            console.log(error);
-        }
-    })
-
-    unblur('playingArea')
-    hide('menu')
-    hide('div-admin')
-}
-
-function connectToGame(gameId) {
-    $.ajax({
-        url: url + "/game/connect",
-        type: 'POST',
-        headers: {
-            "Authorization": getCookie()
-        },
-        dataType: "json",
-        contentType: "application/json",
-        data: JSON.stringify({
-            "username": username,
-            "gameId": gameId
-        }),
-        success: function (game) {
-            connectToSocket(game);
-            },
-        error: function (error) {
-            console.log(error);
-        }
-    })
-
-    unblur('playingArea')
-}
-
-function getAvailableGames() {
-    $.ajax({
-        url: url + "/game/list",
-        type: 'GET',
-        headers: {
-            "Authorization": getCookie()
-        },
-        success: function (gamesList) {
-            showAvailableGamesList(gamesList)
-        },
-        error: function (error) {
-            console.log(error);
-        }
-    })
 }
 
 function postSelectCard(cardId) {
@@ -171,58 +90,6 @@ function postSelectAnswer(victoriousPlayerId) {
             console.log(error);
         }
     })
-}
-
-function suggestAnswer() {
-    const textArea = document.getElementById("suggest-answer")
-    const suggestedAnswerText = textArea.value
-    if (isEmpty(suggestedAnswerText, "Введите текст карты!")) {
-        return
-    }
-
-    $.ajax({
-        url: url + "/answer/suggest",
-        type: 'POST',
-        headers: {
-            "Authorization": getCookie()
-        },
-        dataType: "json",
-        contentType: "application/json",
-        data: JSON.stringify({
-            "text": suggestedAnswerText
-        }),
-        error: function (error) {
-            console.log(error);
-        }
-    })
-
-    textArea.value = ""
-}
-
-function suggestQuestion() {
-    const textArea = document.getElementById("suggest-question")
-    const suggestedQuestionText = textArea.value
-    if (isEmpty(suggestedQuestionText, "Введите текст вопроса!")) {
-        return
-    }
-
-    $.ajax({
-        url: url + "/question/suggest",
-        type: 'POST',
-        headers: {
-            "Authorization": getCookie()
-        },
-        dataType: "json",
-        contentType: "application/json",
-        data: JSON.stringify({
-            "text": suggestedQuestionText
-        }),
-        error: function (error) {
-            console.log(error);
-        }
-    })
-
-    textArea.value = ""
 }
 
 function addAnswer() {

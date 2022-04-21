@@ -56,8 +56,10 @@ public class GameService {
     private final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
     @Transactional
-    public GameDto createGame(String username) {
+    public GameDto createGame(String username, String gameName) {
         Game game = new Game();
+        game.setName(gameName);
+        game.setRound(0);
         game.setState(GameState.CREATED);
         game.setMinPlayersAmount(MIN_PLAYERS_AMOUNT);
 
@@ -231,6 +233,7 @@ public class GameService {
         log.info("set SELECTING_ANSWERS state for game {}", gameId);
         Game game = getGameById(gameId);
 
+        game.incrementRound();
         game.setCurrentQuestion(getRandomQuestion());
         game.setNextCurrentPlayer();
         game.setState(GameState.SELECTING_ANSWERS);

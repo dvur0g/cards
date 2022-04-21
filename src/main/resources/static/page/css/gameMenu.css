@@ -1,0 +1,227 @@
+@font-face {
+    font-family: TTCommonsBold;
+    src: url(../fonts/TTCommons-Bold.ttf);
+}
+@font-face {
+    font-family: TTCommonsExtraBold;
+    src: url(../fonts/TTCommons-ExtraBold.ttf);
+}
+@font-face {
+    font-family: TTCommonsMedium;
+    src: url(../fonts/TTCommons-Medium.ttf);
+}
+
+body{
+    background:#191919;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+}
+
+.box{
+    padding-top: 5%;
+    width: 1100px;
+    transform: scale(0.87);
+}
+
+.title{
+    position: absolute;
+    width: 200px;
+    font-family: TTCommonsBold;
+    font-size: 38px;
+    top: -100px;
+    color: #48ffcf;
+}
+
+.box-big{
+    width: 100%;
+    height: 600px;
+    position: relative;
+    top: calc(45vh - 380px);
+    display: flex;
+    flex-direction: row;
+}
+
+.box-content-left,
+.box-content-center,
+.box-content-right{
+    position: relative;
+    width: calc(100%/3);
+    height: 700px;
+    background: #353535;
+    margin: 0 5px;
+    padding-left: 20px;
+    box-sizing: border-box;
+}
+
+.box-content-left .list-game,
+.info-game,
+.how-play{
+    font-family: TTCommonsBold;
+    font-size: 28px;
+    margin-top: 20px;
+    margin-bottom: 10px;  
+}
+
+.new-game-or-connect-button{
+    width: 122px;
+    border-bottom: 2px solid white;
+    font-family: TTCommonsMedium;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+#gamesList{
+    /*display: flex;*/
+    flex-direction: column;
+    height: 70%;
+    justify-content: space-around;
+    align-items: flex-start;
+    padding-left: 10px;
+    font-family: TTCommonsMedium;
+}
+
+.game-name{
+    list-style-type: none;
+    font-size: 20px;
+    color: #707070;
+    cursor: pointer;
+}
+
+.game-name:hover{
+    color: white;
+}
+
+.game-round,
+.players,
+.player-name{
+    font-family: TTCommonsMedium;
+    font-size: 22px;
+}
+
+.player-name{
+    cursor: pointer;
+    list-style-type: none;
+}
+
+#playerScoreList{
+    padding-left: 0;
+    margin-top: 0;
+}
+
+.game-round{
+    margin: 10px 0;
+}
+
+#gameRoundNumber,
+.player-score{
+    display: inline;
+    font-family: TTCommonsExtraBold;
+    font-size: 22px;
+}
+
+.instruction {
+    font-family: TTCommonsMedium;
+    font-size: 16px;
+    margin: -2px 20px 20px auto;
+    text-align: justify;
+}
+
+.your-card,
+.your-question {
+    font-family: TTCommonsMedium;
+    font-size: 22px;
+    margin: 20px auto;
+}
+
+#suggestCardText{
+    height: 35px;
+    width: 90%;
+    padding-left: 10px;
+    font-size: 20px;
+    font-family: TTCommonsMedium;
+    margin: 10px auto;
+    border: none;
+}
+
+#suggestedQuestionText{
+    height: 100px;
+    width: 90%;
+    padding-left: 10px;
+    padding-top: 7px;
+    font-size: 20px;
+    font-family: TTCommonsMedium;
+    margin: 10px auto;
+    border: none;
+    resize: none;
+}
+
+.your-button{
+    color: black;
+    background-color: #48ffcf;
+    text-align: center;
+    height: 45px;
+    width: 94%;
+    border: none;
+    padding-top: 8px;
+    font-size: 24px;
+    letter-spacing: 2px;
+    font-family: TTCommonsBold;
+    cursor: pointer;
+    margin-bottom: 30px;
+}
+
+#newGameButton{
+    width: 90%;
+}
+
+#new_game{
+    font-size: 20px;
+    margin: 0 10px 10px;
+}
+
+#gameNameInput{
+    height: 35px;
+    width: 86.5%;
+    padding-left: 10px;
+    font-size: 20px;
+    font-family: TTCommonsMedium;
+    margin: 10px auto;
+    border: none;
+}
+
+.game-info{
+    font-family: TTCommonsBold;
+    font-size: 28px;
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+.button-connect{
+    position: absolute;
+    bottom: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #48ffcf;
+    margin: 0 auto;
+    height: 45px;
+    width: 90%;
+    border: none;
+    padding-top: 8px;
+    font-size: 24px;
+    letter-spacing: 2px;
+    font-family: TTCommonsBold;
+    cursor: pointer;
+}
+
+#box-new-game{
+    position: absolute;
+    width: 100%;    
+}
+
+#box-connect{
+    visibility: hidden;
+    width: 100%;
+}

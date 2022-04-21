@@ -90,30 +90,6 @@ function updateVictoriousAnswer(victoriousAnswer) {
     }
 }
 
-function showAvailableGamesList(games) {
-    const list = document.createElement('ul');
-
-    for (let i = 0; i < games.length; ++i) {
-        const item = document.createElement('li');
-
-        let playersList = ""
-        games[i].players.forEach(player => {
-            playersList += player.username + ", ";
-        })
-        playersList = playersList.slice(0, -2)
-
-        item.appendChild(document.createTextNode(games[i].id + " | " + games[i].state + " | [" + playersList + "]"));
-        item.onclick = function() {
-            connectToGame(games[i].id)
-        };
-
-        list.appendChild(item);
-    }
-
-    clear('gamesList');
-    get('gamesList').appendChild(list);
-}
-
 function selectCard(cardHolderIndex) {
     let cardId = get("cardHolder" + cardHolderIndex + "id").innerHTML;
 
