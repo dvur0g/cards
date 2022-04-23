@@ -1,11 +1,5 @@
 const COOKIE_NAME = "CARDS_COOKIE";
 
-document.getElementById('password').addEventListener('keyup',function(event) {
-    if (event.code === "Enter") {
-        doLogin()
-    }
-});
-
 function doLogin() {
     const username = get('login').value;
     const password = get('password').value;

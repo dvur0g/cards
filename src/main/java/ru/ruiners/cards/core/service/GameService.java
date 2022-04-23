@@ -196,7 +196,7 @@ public class GameService {
         repository.save(game);
 
         //TODO
-        //тут падает иногда, надо починить
+        // тут падает иногда, надо починить
         setShowingVictoriousAnswerState(game.getId());
     }
 
@@ -267,11 +267,12 @@ public class GameService {
     }
 
     @Transactional
-    public void setShowingVictoriousAnswerState(Long gameId) {
+    synchronized public void setShowingVictoriousAnswerState(Long gameId) {
         log.info("set SHOWING_VICTORIOUS_ANSWER state for game {}", gameId);
         Game game = getGameById(gameId);
 
         if (!game.getState().equals(GameState.SELECTING_VICTORIOUS_ANSWER)) {
+            log.info("game {} has already passed SELECTING_VICTORIOUS_ANSWER state", gameId);
             return;
         }
 
