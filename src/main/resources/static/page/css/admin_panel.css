@@ -1,0 +1,196 @@
+
+@font-face {
+    font-family: TTCommonsBold;
+    src: url(../fonts/TTCommons-Bold.ttf);
+}
+
+@font-face {
+    font-family: TTCommonsExtraBold;
+    src: url(../fonts/TTCommons-ExtraBold.ttf);
+}
+
+@font-face {
+    font-family: TTCommonsMedium;
+    src: url(../fonts/TTCommons-Medium.ttf);
+}
+
+body{
+    background:#191919;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    color: white;
+}
+
+.box{
+    width: 1100px;
+    height: 90vh;
+    transform: scale(0.85);
+}
+
+.title{
+    position: absolute;
+    width: 200px;
+    font-family: TTCommonsBold;
+    font-size: 38px;
+    top: -80px;
+    color: #48ffcf;
+}
+
+.box-big{
+    width: 100%;
+    height: 700px;
+    position: relative;
+    top: calc(45vh - 380px);
+    display: flex;
+    flex-direction: row;
+}
+
+.box-content-left{
+    width: 70%;
+    height: 700px;
+    background: #353535;
+    margin: 0 5px;
+    padding-left: 20px;
+    box-sizing: border-box;
+}
+
+.box-content-right{
+    width: 30%;
+    height: 700px;
+    background: #353535;
+    margin: 0 5px;
+    padding-left: 20px;
+    box-sizing: border-box;
+}
+
+.box-content-left #list-game {
+    font-family: TTCommonsBold;
+    font-size: 28px;
+    margin-top: 20px;
+    margin-bottom: 10px;  
+}
+
+#admin-list{
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: flex-start;
+    display: flex;
+    flex-direction: column;
+    height: 78%;
+    justify-content: space-around;
+    align-items: flex-start;
+    padding-left: 10px;
+    font-family: TTCommonsMedium;
+}
+
+.random-name{
+    list-style-type: none;
+    width: 90%;
+    font-size: 20px;
+    color: #707070;
+    display: inline;
+}
+
+.button-yes{
+    background: #48ffcf;
+    border: none;
+    margin: 4px;
+    height: 30px;
+    font-size: 20px;
+    width: 100px;
+    text-align: center;
+    padding: 5px;
+    cursor: pointer;
+    font-family: TTCommonsBold;
+}
+
+.button-no{
+    background: #ff4a60;
+    border: none;
+    margin: 2px;
+    padding: 5px;
+    height: 30px;
+    width: 130px;
+    text-align: center;
+    font-size: 20px;
+    color: white;
+    cursor: pointer;
+    font-family: TTCommonsMedium;
+}
+
+.box-next-list{
+    color: #707070;
+    font-size: 26px;
+    font-family: TTCommonsMedium;
+    display: flex;
+    width: 300px;
+    margin-left: 5px;
+}
+
+.number-list #number{
+    display: inline-block;
+    margin-left: 5px;
+}
+
+.box-left-button,
+.box-right-button{
+    width: 40px;
+    height: 40px;
+    background: #bdbdbd;
+    display: inline-block;
+    margin-left: 15px;
+    position: relative;
+    cursor: pointer;
+    text-align: center;
+    font-size: 36px;
+    color: black;
+}
+
+.box-content-right{
+    display: flex;
+    flex-direction: column;
+    padding-right: 20px;
+    padding-top: 30px;
+    padding-left: 10px;
+    position: relative;
+}
+
+.go-back{
+    right: 10px;
+    color: #707070;
+    font-size: 20px;
+    font-family: TTCommonsMedium;
+    position: absolute;
+    right: 20px;
+}
+
+.go-back .text-go-back{
+    display: inline;
+    color: white;
+    border-bottom: 2px solid white;
+    margin-left: 5px;
+    cursor: pointer;
+}
+
+.list-our-answer{
+    padding: 0;
+    position: absolute;
+    right: 20px;
+    top:  50px;
+}
+
+.list-answer{
+    list-style-type: none;
+    min-width:60%;
+    background-color: rgb(204, 202, 202);
+    color: black;
+    margin-top: 10px;
+    padding: 7px;
+    font-size: 16px;
+    font-family: TTCommonsBold;
+    text-transform: uppercase;
+    height: 20px;
+    cursor: pointer;
+}

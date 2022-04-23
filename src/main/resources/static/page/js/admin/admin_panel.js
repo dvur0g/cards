@@ -1,12 +1,48 @@
-let isDeleted = false;
+let page = 0;
+let count = 12
 
-function showAnswers() {
-    const page = get("page").value;
-    const count = get("count").value;
+let menu = 2;
 
-    if (isEmpty(page, "Введите номер страницы!") || isEmpty(count, "Введите кол-во записей!")) {
+document.addEventListener("DOMContentLoaded", function() {
+    show()
+})
+
+function prevPage() {
+    if (page < 1) {
         return
     }
+
+    --page;
+    show()
+}
+
+function nextPage() {
+    ++page;
+    show()
+}
+
+function showNew(newMenu) {
+    menu = newMenu
+    page = 0
+    show()
+}
+
+function show() {
+    if (menu === 0) {
+        showAnswers()
+    } else if (menu === 1) {
+        showQuestions()
+    } else if (menu === 2) {
+        showSuggestedAnswers()
+    } else if (menu === 3) {
+        showSuggestedQuestions()
+    }
+
+    get('number').innerText = (page < 10) ? '0' + (page + 1) : (page + 1);
+}
+
+function showAnswers() {
+    get('list-game').innerText = "Список карт"
 
     $.ajax({
         url: url + "/answer/list?page=" + page + "&count=" + count,
@@ -15,16 +51,19 @@ function showAnswers() {
             "Authorization": getCookie()
         },
         success: function (cardList) {
-            const list = document.createElement('ul');
+            const list = get('admin-list');
+            clear('admin-list')
 
             for (let i = 0; i < cardList.length; ++i) {
                 const item = document.createElement('li');
+                item.classList.add('random-name')
 
                 item.appendChild(document.createTextNode(cardList[i].text + " | "
-                    + cardList[i].username + " | " + cardList[i].date));
+                    + cardList[i].username + " | " + cardList[i].date.toString().substring(0, 16)));
 
                 const buttonDelete = document.createElement("button");
-                buttonDelete.textContent = "Удалить";
+                buttonDelete.classList.add("button-no")
+                buttonDelete.textContent = "УДАЛИТЬ";
                 buttonDelete.onclick = function () {
                     $.ajax({
                         url: url + "/answer/delete/" + cardList[i].id,
@@ -41,12 +80,9 @@ function showAnswers() {
                     })
                 };
 
-                list.appendChild(item);
-                list.appendChild(buttonDelete)
+                item.appendChild(buttonDelete)
+                list.appendChild(item)
             }
-
-            clear('admin-list');
-            get('admin-list').appendChild(list);
         },
         error: function (error) {
             console.log(error);
@@ -55,12 +91,7 @@ function showAnswers() {
 }
 
 function showQuestions() {
-    const page = get("page").value;
-    const count = get("count").value;
-
-    if (isEmpty(page, "Введите номер страницы!") || isEmpty(count, "Введите кол-во записей!")) {
-        return
-    }
+    get('list-game').innerText = "Список вопросов"
 
     $.ajax({
         url: url + "/question/list?page=" + page + "&count=" + count,
@@ -69,16 +100,19 @@ function showQuestions() {
             "Authorization": getCookie()
         },
         success: function (cardList) {
-            const list = document.createElement('ul');
+            const list = get('admin-list');
+            clear('admin-list')
 
             for (let i = 0; i < cardList.length; ++i) {
                 const item = document.createElement('li');
+                item.classList.add('random-name')
 
                 item.appendChild(document.createTextNode(cardList[i].text + " | "
-                    + cardList[i].username + " | " + cardList[i].date));
+                    + cardList[i].username + " | " + cardList[i].date.toString().substring(0, 16)));
 
                 const buttonDelete = document.createElement("button");
-                buttonDelete.textContent = "Удалить";
+                buttonDelete.classList.add("button-no")
+                buttonDelete.textContent = "УДАЛИТЬ";
                 buttonDelete.onclick = function () {
                     $.ajax({
                         url: url + "/question/delete/" + cardList[i].id,
@@ -87,7 +121,7 @@ function showQuestions() {
                             "Authorization": getCookie()
                         },
                         success: function () {
-                            showQuestions();
+                            show();
                         },
                         error: function (error) {
                             console.log(error);
@@ -95,12 +129,9 @@ function showQuestions() {
                     })
                 };
 
-                list.appendChild(item);
-                list.appendChild(buttonDelete)
+                item.appendChild(buttonDelete)
+                list.appendChild(item)
             }
-
-            clear('admin-list');
-            get('admin-list').appendChild(list);
         },
         error: function (error) {
             console.log(error);
@@ -109,30 +140,28 @@ function showQuestions() {
 }
 
 function showSuggestedAnswers() {
-    const page = get("page").value;
-    const count = get("count").value;
-
-    if (isEmpty(page, "Введите номер страницы!") || isEmpty(count, "Введите кол-во записей!")) {
-        return
-    }
+    get('list-game').innerText = "Список предложенных карт"
 
     $.ajax({
-        url: url + "/answer/suggested/list?page=" + page + "&count=" + count + "&isDeleted=" + isDeleted,
+        url: url + "/answer/suggested/list?page=" + page + "&count=" + count,
         type: 'GET',
         headers: {
             "Authorization": getCookie()
         },
         success: function (cardList) {
-            const list = document.createElement('ul');
+            const list = get('admin-list');
+            clear('admin-list')
 
             for (let i = 0; i < cardList.length; ++i) {
                 const item = document.createElement('li');
+                item.classList.add('random-name')
 
                 item.appendChild(document.createTextNode(cardList[i].text + " | "
-                    + cardList[i].username + " | " + cardList[i].date));
+                    + cardList[i].username + " | " + cardList[i].date.toString().substring(0, 16)));
 
                 const buttonApprove = document.createElement("button");
-                buttonApprove.textContent = "Принять";
+                buttonApprove.classList.add("button-yes")
+                buttonApprove.textContent = "ПРИНЯТЬ";
                 buttonApprove.onclick = function () {
                     $.ajax({
                         url: url + "/answer/suggest/approve/" + cardList[i].id,
@@ -150,7 +179,8 @@ function showSuggestedAnswers() {
                 };
 
                 const buttonDisapprove = document.createElement("button");
-                buttonDisapprove.textContent = "Отклонить";
+                buttonDisapprove.classList.add("button-no")
+                buttonDisapprove.textContent = "ОТКЛОНИТЬ";
                 buttonDisapprove.onclick = function () {
                     $.ajax({
                         url: url + "/answer/suggest/disapprove/" + cardList[i].id,
@@ -159,7 +189,7 @@ function showSuggestedAnswers() {
                             "Authorization": getCookie()
                         },
                         success: function () {
-                            showSuggestedAnswers();
+                            show();
                         },
                         error: function (error) {
                             console.log(error);
@@ -167,13 +197,10 @@ function showSuggestedAnswers() {
                     })
                 };
 
-                list.appendChild(item);
                 item.appendChild(buttonApprove)
                 item.appendChild(buttonDisapprove)
+                list.appendChild(item);
             }
-
-            clear('admin-list');
-            get('admin-list').appendChild(list);
         },
         error: function (error) {
             console.log(error);
@@ -182,30 +209,27 @@ function showSuggestedAnswers() {
 }
 
 function showSuggestedQuestions() {
-    const page = get("page").value;
-    const count = get("count").value;
-
-    if (isEmpty(page, "Введите номер страницы!") || isEmpty(count, "Введите кол-во записей!")) {
-        return
-    }
+    get('list-game').innerText = "Список предложенных вопросов"
 
     $.ajax({
-        url: url + "/question/suggested/list?page=" + page + "&count=" + count + "&isDeleted=" + isDeleted,
+        url: url + "/question/suggested/list?page=" + page + "&count=" + count,
         type: 'GET',
         headers: {
             "Authorization": getCookie()
         },
         success: function (questionList) {
-            const list = document.createElement('ul');
+            const list = get('admin-list');
+            clear('admin-list')
 
             for (let i = 0; i < questionList.length; ++i) {
                 const item = document.createElement('li');
-
+                item.classList.add("random-name")
                 item.appendChild(document.createTextNode(questionList[i].text + " | "
-                    + questionList[i].username + " | " + questionList[i].date));
+                    + questionList[i].username + " | " + questionList[i].date.toString().substring(0, 16)));
 
                 const buttonApprove = document.createElement("button");
-                buttonApprove.textContent = "Принять";
+                buttonApprove.classList.add("button-yes")
+                buttonApprove.textContent = "ПРИНЯТЬ";
                 buttonApprove.onclick = function () {
                     $.ajax({
                         url: url + "/question/suggest/approve/" + questionList[i].id,
@@ -214,7 +238,7 @@ function showSuggestedQuestions() {
                             "Authorization": getCookie()
                         },
                         success: function () {
-                            showSuggestedQuestions();
+                            show();
                         },
                         error: function (error) {
                             console.log(error);
@@ -223,7 +247,8 @@ function showSuggestedQuestions() {
                 };
 
                 const buttonDisapprove = document.createElement("button");
-                buttonDisapprove.textContent = "Отклонить";
+                buttonDisapprove.classList.add("button-no")
+                buttonDisapprove.textContent = "ОТКЛОНИТЬ";
                 buttonDisapprove.onclick = function () {
                     $.ajax({
                         url: url + "/question/suggest/disapprove/" + questionList[i].id,
@@ -232,7 +257,7 @@ function showSuggestedQuestions() {
                             "Authorization": getCookie()
                         },
                         success: function () {
-                            showSuggestedQuestions();
+                            show();
                         },
                         error: function (error) {
                             console.log(error);
@@ -245,9 +270,6 @@ function showSuggestedQuestions() {
                 item.appendChild(buttonDisapprove)
                 list.appendChild(item);
             }
-
-            clear('admin-list');
-            get('admin-list').appendChild(list);
         },
         error: function (error) {
             console.log(error);
@@ -255,10 +277,6 @@ function showSuggestedQuestions() {
     })
 }
 
-function filterDeleted() {
-    isDeleted = true;
-}
-
-function filterWithoutDeleted() {
-    isDeleted = false;
+function goBack() {
+    window.location.href = '/page/gameMenu.html'
 }

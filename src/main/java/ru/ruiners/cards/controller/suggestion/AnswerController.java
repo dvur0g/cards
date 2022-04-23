@@ -23,9 +23,8 @@ public class AnswerController {
     @GetMapping("/suggested/list")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<SuggestedAnswerDto>> getSuggestedAnswerList(@RequestParam int page,
-                                                                               @RequestParam int count,
-                                                                               @RequestParam boolean isDeleted) {
-        return ResponseEntity.ok(answerService.getSuggestedAnswerList(page, count, isDeleted));
+                                                                               @RequestParam int count) {
+        return ResponseEntity.ok(answerService.getSuggestedAnswerList(page, count));
     }
 
     @PostMapping("/suggest/approve/{id}")

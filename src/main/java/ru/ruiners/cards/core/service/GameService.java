@@ -195,6 +195,8 @@ public class GameService {
         game.setVictoriousPlayer(victoriousPlayer);
         repository.save(game);
 
+        //TODO
+        //тут падает иногда, надо починить
         setShowingVictoriousAnswerState(game.getId());
     }
 

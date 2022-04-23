@@ -56,7 +56,7 @@ public class GameController {
     }
 
     @PostMapping("/gameplay")
-//    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<GameDto> gamePlay(@RequestBody GamePlayDto body) {
         log.info("gameplay: {}", body);
 

@@ -31,8 +31,8 @@ public class QuestionService {
 
     private final AuthenticationService authenticationService;
 
-    public List<SuggestedQuestionDto> getSuggestedQuestionList(int page, int count, boolean isDeleted) {
-        return suggestedQuestionRepository.findAllByDeletedOrderByDateDesc(isDeleted, PageRequest.of(page, count))
+    public List<SuggestedQuestionDto> getSuggestedQuestionList(int page, int count) {
+        return suggestedQuestionRepository.findAllByOrderByDateDesc(PageRequest.of(page, count))
                 .stream().map(suggestedQuestionMapper::toDto).collect(Collectors.toList());
     }
 

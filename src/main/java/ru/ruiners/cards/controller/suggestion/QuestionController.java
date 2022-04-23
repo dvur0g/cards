@@ -23,9 +23,8 @@ public class QuestionController {
     @GetMapping("/suggested/list")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<SuggestedQuestionDto>> getSuggestedQuestionList(@RequestParam int page,
-                                                                               @RequestParam int count,
-                                                                               @RequestParam boolean isDeleted) {
-        return ResponseEntity.ok(questionService.getSuggestedQuestionList(page, count, isDeleted));
+                                                                               @RequestParam int count) {
+        return ResponseEntity.ok(questionService.getSuggestedQuestionList(page, count));
     }
 
     @PostMapping("/suggest/approve/{id}")

@@ -10,6 +10,6 @@ import java.util.List;
 @Repository
 public interface SuggestedQuestionRepository extends CrudRepository<SuggestedQuestion, Long> {
 
-    List<SuggestedQuestion> findAllByDeletedOrderByDateDesc(boolean isDeleted, Pageable pageable);
+    List<SuggestedQuestion> findAllByOrderByDateDesc(Pageable pageable);
 
 }

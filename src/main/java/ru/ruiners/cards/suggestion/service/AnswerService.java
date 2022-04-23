@@ -31,8 +31,8 @@ public class AnswerService {
 
     private final AuthenticationService authenticationService;
 
-    public List<SuggestedAnswerDto> getSuggestedAnswerList(int page, int count, boolean isDeleted) {
-        return suggestedAnswerRepository.findAllByDeletedOrderByDateDesc(isDeleted, PageRequest.of(page, count))
+    public List<SuggestedAnswerDto> getSuggestedAnswerList(int page, int count) {
+        return suggestedAnswerRepository.findAllByOrderByDateDesc(PageRequest.of(page, count))
                 .stream().map(suggestedAnswerMapper::toDto).collect(Collectors.toList());
     }
 
