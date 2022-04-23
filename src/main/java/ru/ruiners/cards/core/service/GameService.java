@@ -167,6 +167,9 @@ public class GameService {
         player.setSelectedAnswer(card);
         playerRepository.save(player);
 
+        //TODO
+        // если все игроки выбрали ответы, переводить в статус SELECTING_VICTORIOUS_ANSWER
+        // но из-за этого падает
         GameDto result = mapper.toDto(repository.save(game));
         simpMessagingTemplate.convertAndSend(TOPIC + result.getId(), result);
     }
@@ -245,6 +248,9 @@ public class GameService {
         GameDto result = mapper.toDto(game, SELECTING_ANSWERS_DELAY);
         simpMessagingTemplate.convertAndSend(TOPIC + result.getId(), result);
 
+        //TODO
+        // если никто никто из игроков не выбрал ответ, то происходит непонятная задержка
+        // перед переходом в следующее состояние
         executor.schedule(() -> setSelectingVictoriousAnswerState(game.getId()), SELECTING_ANSWERS_DELAY, TimeUnit.SECONDS);
     }
 
