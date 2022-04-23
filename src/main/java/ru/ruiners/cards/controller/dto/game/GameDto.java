@@ -14,6 +14,7 @@ public class GameDto {
     private GameState state;
     private int round;
     private PlayerDto currentPlayer;
+    private PlayerDto victoriousPlayer;
     private CardDto victoriousAnswer;
     private List<PlayerDto> players;
     private QuestionDto currentQuestion;

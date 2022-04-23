@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class GameService {
 
-    private static final int MAX_PLAYERS_AMOUNT = 5;
+    private static final int MAX_PLAYERS_AMOUNT = 10;
     private static final int MAX_CARDS_AMOUNT = 10;
     private static final int PROCESSING_DELAY = 10;
     private static final int SELECTING_ANSWERS_DELAY = 20;
@@ -213,6 +213,7 @@ public class GameService {
         Game game = getGameById(gameId);
         game.setState(GameState.PROCESSING);
         game.setVictoriousAnswer(null);
+        game.setVictoriousPlayer(null);
         repository.save(game);
 
         game.getPlayers().forEach(p -> {
@@ -254,12 +255,6 @@ public class GameService {
             return;
         }
 
-        //TODO ломает цикл
-//        if (game.getPlayers().stream().noneMatch(p -> p.getSelectedAnswer() != null)) {
-//            setShowingVictoriousAnswerState(gameId);
-//            return;
-//        }
-
         game.setState(GameState.SELECTING_VICTORIOUS_ANSWER);
         repository.save(game);
 
@@ -282,7 +277,6 @@ public class GameService {
         if (victoriousPlayer != null) {
             game.setVictoriousAnswer(victoriousPlayer.getSelectedAnswer());
             victoriousPlayer.incrementScore();
-            game.setVictoriousPlayer(null);
         }
 
         game.setState(GameState.SHOW_VICTORIOUS_ANSWER);

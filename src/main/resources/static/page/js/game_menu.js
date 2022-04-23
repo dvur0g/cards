@@ -5,14 +5,6 @@ function toggleNewGame() {
     get("box-connect").style.visibility = "hidden"
 }
 
-document.addEventListener("DOMContentLoaded", function() {
-    getAvailableGames()
-})
-
-const interval = setInterval(function() {
-    getAvailableGames()
-}, 5000);
-
 function getAvailableGames() {
     $.ajax({
         url: url + "/game/list",
@@ -91,7 +83,7 @@ function createGame() {
             "name": gameName
         }),
         success: function (game) {
-            connectToSocket(game);
+            window.location.href = '/page/gamePlay.html?gameId=' + game.id
         },
         error: function (error) {
             console.log(error);
@@ -112,34 +104,13 @@ function connectToGame() {
             "gameId": currentGameId
         }),
         success: function (game) {
-            connectToSocket(game);
+            window.location.href = '/page/gamePlay.html?gameId=' + game.id
         },
         error: function (error) {
             console.log(error);
         }
     })
 }
-
-function connectToSocket(game) {
-    console.log("connecting to the game " + game.id);
-
-    let socket = new SockJS(url + "/gameplay");
-    stompClient = Stomp.over(socket);
-    stompClient.connect({}, function (frame) {
-        console.log("connected to the frame: " + frame);
-        stompClient.subscribe("/topic/game-progress/" + game.id, function (response) {
-            let data = JSON.parse(response.body);
-
-            update(data);
-        })
-    })
-
-    gameId = game.id;
-
-    //TODO
-    // update(game);
-}
-
 
 function suggestAnswer() {
     const textArea = document.getElementById("suggestCardText")

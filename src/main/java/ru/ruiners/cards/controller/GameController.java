@@ -56,10 +56,11 @@ public class GameController {
     }
 
     @PostMapping("/gameplay")
-    @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<GameDto> gamePlay(@RequestBody GamePlayDto request) {
-        log.info("gameplay: {}", request);
-        return ResponseEntity.ok(gameService.gamePlay(request, authenticationService.getUsername()));
+//    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<GameDto> gamePlay(@RequestBody GamePlayDto body) {
+        log.info("gameplay: {}", body);
+
+        return ResponseEntity.ok(gameService.gamePlay(body, authenticationService.getUsername()));
     }
 
     @PostMapping("/select-card")

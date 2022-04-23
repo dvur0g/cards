@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.ruiners.cards.controller.dto.authentication.*;
 import ru.ruiners.cards.security.service.AuthenticationService;
 import ru.ruiners.cards.security.service.KeycloakAuthenticationClient;
-import ru.ruiners.cards.security.service.KeycloakClient;
+import ru.ruiners.cards.security.client.KeycloakClient;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;

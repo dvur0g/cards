@@ -1,4 +1,4 @@
-package ru.ruiners.cards.security;
+package ru.ruiners.cards.configuration;
 
 import lombok.RequiredArgsConstructor;
 import org.keycloak.adapters.KeycloakConfigResolver;
@@ -59,6 +59,7 @@ public class WebSecurityConfiguration extends KeycloakWebSecurityConfigurerAdapt
                 .and().authorizeRequests().antMatchers("/auth/login").permitAll()
                 .and().authorizeRequests().antMatchers("/auth/register").permitAll()
                 .and().authorizeRequests().antMatchers("/page/**").permitAll()
+                .and().authorizeRequests().antMatchers("/gameplay/**").permitAll()
                 .anyRequest().fullyAuthenticated();
     }
 

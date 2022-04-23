@@ -1,4 +1,4 @@
-package ru.ruiners.cards.security.service;
+package ru.ruiners.cards.security.client;
 
 import liquibase.repackaged.org.apache.commons.lang3.StringUtils;
 import lombok.RequiredArgsConstructor;

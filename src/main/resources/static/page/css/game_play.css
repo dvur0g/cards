@@ -1,0 +1,294 @@
+@font-face {
+    font-family: TTCommonsBold;
+    src: url(../fonts/TTCommons-Bold.ttf);
+}
+@font-face {
+    font-family: TTCommonsExtraBold;
+    src: url(../fonts/TTCommons-ExtraBold.ttf);
+}
+@font-face {
+    font-family: TTCommonsMedium;
+    src: url(../fonts/TTCommons-Medium.ttf);
+}
+@font-face {
+    font-family: TTCommonsRegular;
+    src: url(../fonts/TTCommons-Regular.ttf);
+}
+
+body{
+    background:#191919;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+}
+
+.box{
+    padding-top: 5%;
+    width: 1200px;
+    transform: scale(0.87);
+}
+
+.title{
+    position: absolute;
+    width: 200px;
+    font-family: TTCommonsBold;
+    font-size: 38px;
+    top: -80px;
+    left: 3px;
+    color: #48ffcf;
+}
+
+.box-big{
+    width: 100%;
+    height: 600px;
+    position: relative;
+    top: calc(45vh - 380px);
+    display: flex;
+    flex-direction: row;
+}
+
+.box-content-left{
+    width: 30%;
+    height: 700px;
+    margin: 0 5px;
+    box-sizing: border-box;
+}
+
+.box-left-top{
+    height: 50%;
+    width: 100%;
+    background: #353535;
+    padding-left: 15px;
+    padding-top: 15px;
+    box-sizing: border-box;
+    position: relative;
+}
+
+.box-question{
+    
+    color: #ffffff;
+}
+
+.box-title-question{
+    font-family:TTCommonsRegular;
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+.box-title-players{
+    font-family:TTCommonsRegular;
+    font-size: 14px;
+    padding-top: 15px;
+}
+
+#question,
+.victorious-answer{
+    font-family: TTCommonsBold;
+    font-size: 36px;
+    /*line-height: 30px;*/
+}
+
+.victorious-answer{
+    color: #48ffcf;
+}
+
+.current-player{
+    position: absolute;
+    bottom: 15px;
+    left: 15px;
+    font-size: 14px;
+    font-family:TTCommonsMedium;
+}
+
+.box-left-center{
+    height: 12%;
+    width: 100%;
+    background: #353535;
+    margin: 8px 0;
+}
+
+.leading-box{
+    width: 100%;
+    height: 50%;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: start;
+    align-items: center;
+}
+
+#timer{
+    width: 50px;
+    height: 50px;
+    border: 2px solid white;
+    display: flex;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    font-size: 30px;
+    margin: 20px;
+    padding-top: 7px;
+    font-family: TTCommonsMedium;
+    box-sizing: border-box;
+}
+
+#hint{
+    font-size: 20px;
+    font-family: TTCommonsMedium;
+    line-height: 18px;
+    padding-top: 10px;
+    padding-left: 3px;
+}
+
+.your-cards{
+    font-size: 14px;
+    padding-top: 5px;
+    padding-left: 13px;
+    font-family: TTCommonsRegular;
+    line-height: 20px;
+    top: 8px;
+    margin-left: 5px;
+    position: absolute;
+}
+
+.box-left-bottom{
+    height: 47%;
+    width: 100%;
+    background: #353535;
+    padding-left: 20px;
+    box-sizing: border-box;
+}
+
+.box-content-center{
+    margin-top: 10px;
+    padding-top: 10px;
+}
+
+.rounds-game,
+.player-name{
+    font-family: TTCommonsMedium;
+    font-size: 14px;
+    margin: 4px;
+}
+
+.player-name-number{
+    display: inline;
+    font-family: TTCommonsMedium;
+    font-size: 16px;
+    margin-left: 10px;
+}
+
+#currentUsername{
+    font-family: TTCommonsBold;
+}
+
+.player-name{
+    list-style-type: none;
+}
+
+#playersList{
+    padding-left: 0px;
+    margin-top: 0px;
+}
+
+.rounds-game{
+    margin: 10px 0;
+}
+
+.box-content-right{
+    width: 70%;
+    height: 780px;
+    margin: 0 5px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.box-right-top{
+    height: 70%;
+    width: 94%;
+    background: #353535;
+    margin-bottom: 8px;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.box-right-bottom{
+    position: relative;
+    padding-top: 30px;
+    box-sizing: border-box;
+    height: 59%;
+    width: 94%;
+    background: #353535;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+#selectedCards,
+#yourCards{
+    position: relative;
+    padding-top: 20px;
+    padding-left: 14px;
+    box-sizing: border-box;
+    height: 59%;
+    width: 100%;
+    background: #353535;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+#selectedCards {
+    padding-top: 10px;
+}
+
+
+.content{
+    width: 110px;
+    height: 135px;
+    margin: 5px 5px;
+    background: #a9a9a9;
+    color: black;
+    font-family: TTCommonsBold;
+    font-size: 20px;
+    padding: 15px;
+    cursor: pointer;
+}
+
+.account-close{
+    color: #707070;
+    font-size: 20px;
+    font-family: TTCommonsMedium;
+    position: absolute;
+    right: 50px;
+    top: -45px;
+}
+
+.account-close #disconnect{
+    display: inline;
+    color: white;
+    border-bottom: 2px solid white;
+    margin-left: 5px;
+    cursor: pointer;
+}
+
+.win {
+    background-color:#48ffcf;
+}
+
+.lose {
+    background-color: #5f5b5b;
+}
+
+.finish {
+    color: #5f5b5b;
+}
+
+.winner {
+    color: white;
+}
+
+.hidden {
+    visibility: hidden;
+}

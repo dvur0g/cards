@@ -35,3 +35,12 @@ databaseChangeLog:
             path: sql/004-game-name-and-round.sql
             relativeToChangelogFile: true
             splitStatements: true
+  - changeSet:
+      id: 005-game-state-hint
+      author: dvur0g
+      changes:
+        - sqlFile:
+            encoding: UTF-8
+            path: sql/005-game-state-hint.sql
+            relativeToChangelogFile: true
+            splitStatements: true

@@ -3,7 +3,6 @@ let stompClient;
 
 let username = null;
 let roles = null
-let gameId = null;
 
 document.addEventListener("DOMContentLoaded", function() {
     $.ajax({
@@ -18,9 +17,9 @@ document.addEventListener("DOMContentLoaded", function() {
 
             get("currentUsername").innerHTML = username
             if (roles.has("ADMIN")) {
-                get("div-admin").style.visibility = "visible"
+                // get("div-admin").style.visibility = "visible"
             } else {
-                get("div-admin").style.visibility = "hidden"
+                // get("div-admin").style.visibility = "hidden"
             }
         },
         error: function (error) {
@@ -28,69 +27,6 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     })
 });
-
-window.onbeforeunload = disconnectFromGameBeforeClosingPage;
-function disconnectFromGameBeforeClosingPage() {
-    $.ajax({
-        url: url + "/game/disconnect",
-        type: 'POST',
-        headers: {
-            "Authorization": getCookie()
-        },
-    });
-    stompClient.disconnect();
-}
-
-function disconnectFromGame() {
-    console.log("disconnect from game " + username);
-
-    $.ajax({
-        url: url + "/game/disconnect",
-        type: 'POST',
-        headers: {
-            "Authorization": getCookie()
-        },
-    });
-    stompClient.disconnect();
-}
-
-function postSelectCard(cardId) {
-    $.ajax({
-        url: url + "/game/select-card",
-        type: 'POST',
-        headers: {
-            "Authorization": getCookie()
-        },
-        dataType: "json",
-        contentType: "application/json",
-        data: JSON.stringify({
-            "cardId": cardId,
-            "gameId": gameId
-        }),
-        error: function (error) {
-            console.log(error);
-        }
-    })
-}
-
-function postSelectAnswer(victoriousPlayerId) {
-    $.ajax({
-        url: url + "/game/select-victorious-answer",
-        type: 'POST',
-        headers: {
-            "Authorization": getCookie()
-        },
-        dataType: "json",
-        contentType: "application/json",
-        data: JSON.stringify({
-            "victoriousPlayerId": victoriousPlayerId,
-            "gameId": gameId
-        }),
-        error: function (error) {
-            console.log(error);
-        }
-    })
-}
 
 function addAnswer() {
     const textArea = document.getElementById("add-answer")

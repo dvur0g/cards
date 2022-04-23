@@ -11,6 +11,8 @@ import ru.ruiners.cards.controller.dto.authentication.MeDto;
 import ru.ruiners.cards.core.model.Player;
 import ru.ruiners.cards.core.repository.PlayerRepository;
 
+import java.util.Set;
+
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
@@ -31,7 +33,9 @@ public class AuthenticationService {
 
         return new MeDto()
                 .setUsername(username)
-                .setRoles(accessToken.getRealmAccess().getRoles());
+                //TODO
+//                .setRoles(accessToken.getRealmAccess().getRoles());
+                .setRoles(Set.of("USER"));
     }
 
     private AccessToken getAccessToken() {
