@@ -24,6 +24,8 @@ public class Game {
     )
     private Long id;
 
+    private String name;
+
     @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(cascade = CascadeType.ALL)
     @OrderBy("id")
@@ -38,6 +40,8 @@ public class Game {
 
     @ManyToOne
     private Question currentQuestion;
+
+    private int round = 0;
 
     private Integer currentPlayerIndex = 0;
 
@@ -63,6 +67,10 @@ public class Game {
         }
         currentPlayerIndex = (++currentPlayerIndex) % players.size();
         currentPlayer = players.get(currentPlayerIndex);
+    }
+
+    public void incrementRound() {
+        ++round;
     }
 
 }

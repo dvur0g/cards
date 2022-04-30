@@ -1,19 +1,17 @@
 package ru.ruiners.cards.core.model;
 
 import lombok.Data;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
+import lombok.experimental.Accessors;
 
 import javax.persistence.*;
 import java.util.List;
 
 @Entity
 @Data
-@SQLDelete(sql = "UPDATE player SET deleted = true WHERE id = ?")
-@Where(clause = "deleted = false")
+@Accessors(chain = true)
 public class Player {
 
-    private static final int MAX_SCORE = 5;
+    private static final int MAX_SCORE = 10;
 
     @Id
     @GeneratedValue(
@@ -29,8 +27,6 @@ public class Player {
     @Column(unique = true)
     private String username;
 
-    private String password;
-
     private Integer score;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
@@ -38,8 +34,6 @@ public class Player {
 
     @ManyToOne
     private Card selectedAnswer;
-
-    private boolean deleted = false;
 
     public void incrementScore() {
         ++score;
@@ -51,6 +45,10 @@ public class Player {
 
     public boolean isWinner() {
         return score == MAX_SCORE;
+    }
+
+    public boolean didSelectAnswer() {
+        return selectedAnswer != null;
     }
 
 }

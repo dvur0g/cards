@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>gamePlaying</title>
+    <link rel="stylesheet" href="css/game_play.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.4.0/sockjs.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+</head>
+<body>
+    <div class="box">
+        <div class="box-big">
+            <h1 class="title">cards.io</h1>
+            <div class="account-close">Вы вошли как <label id="currentUsername"></label> <div id="disconnect" onclick="disconnectFromGame()"> Выйти</div></div>
+            <div class="box-content-left">
+                <div class="box-left-top">
+                    <div class="box-question">
+                        <div class="box-title-question">ВОПРОС</div>
+                        <div id="question"></div>
+                        <label id="victoriousAnswer" class="victorious-answer"></label>
+                    </div>
+                    <div class="current-player">ВЕДУЩИЙ: <label id="currentPlayer"></label></div>
+                </div>
+                <div class="box-left-center">
+                    <div class="hidden">.</div>
+                    <div class="leading-box">
+                        <div id="timer"></div>
+                        <div id="hint"></div>
+                    </div>
+                </div>
+                <div class="box-left-bottom">
+                    <div class="box-title-players">ИГРОКИ</div>
+                    <div class="box-content-center">
+                        <ul id="playersList">
+                        </ul>
+                    </div>
+                </div>  
+            </div>
+            <div class="box-content-right">
+                <div class="box-right-top">
+                    <div id="selectedCards">
+                        <div id="cardSelected0" class="left_content_one content hidden" onclick="selectAnswer(0)"></div>
+                        <div id="cardSelected1" class="left_content_two content hidden" onclick="selectAnswer(1)"></div>
+                        <div id="cardSelected2" class="left_content_three content hidden" onclick="selectAnswer(2)"></div>
+                        <div id="cardSelected3" class="left_content_four content hidden" onclick="selectAnswer(3)"></div> <br>
+                        <div id="cardSelected4" class="left_content_five content hidden" onclick="selectAnswer(4)"></div>
+                        <div id="cardSelected5" class="left_content_six content hidden" onclick="selectAnswer(5)"></div>
+                        <div id="cardSelected6" class="left_content_seven content hidden" onclick="selectAnswer(6)"></div>
+                        <div id="cardSelected7" class="left_content_eight content hidden" onclick="selectAnswer(7)"></div>
+                        <div id="cardSelected8" class="left_content_nine content hidden" onclick="selectAnswer(8)"></div>
+                        <div id="cardSelected9" class="left_content_ten content hidden" onclick="selectAnswer(9)"></div>
+                    </div>
+                </div>
+                <div class="box-right-bottom">
+                    <div class="your-cards">ВАШИ КАРТЫ</div>
+                    <div id="yourCards">
+                        <div id="cardHolder0" class="left_content_one content hidden" onclick="selectCard(0)"></div>
+                        <div id="cardHolder1" class="left_content_two content hidden" onclick="selectCard(1)"></div>
+                        <div id="cardHolder2" class="left_content_three content hidden" onclick="selectCard(2)"></div>
+                        <div id="cardHolder3" class="left_content_four content hidden" onclick="selectCard(3)"></div> <br>
+                        <div id="cardHolder4" class="left_content_five content hidden" onclick="selectCard(4)"></div>
+                        <div id="cardHolder5" class="left_content_six content hidden" onclick="selectCard(5)"></div>
+                        <div id="cardHolder6" class="left_content_seven content hidden" onclick="selectCard(6)"></div>
+                        <div id="cardHolder7" class="left_content_eight content hidden" onclick="selectCard(7)"></div>
+                        <div id="cardHolder8" class="left_content_nine content hidden" onclick="selectCard(8)"></div>
+                        <div id="cardHolder9" class="left_content_ten content hidden" onclick="selectCard(9)"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="maintenance" class="hidden">
+        <label id="currentGameId"></label>
+
+        <label id="cardHolder0id"></label>
+        <label id="cardHolder1id"></label>
+        <label id="cardHolder2id"></label>
+        <label id="cardHolder3id"></label>
+        <label id="cardHolder4id"></label>
+        <label id="cardHolder5id"></label>
+        <label id="cardHolder6id"></label>
+        <label id="cardHolder7id"></label>
+        <label id="cardHolder8id"></label>
+        <label id="cardHolder9id"></label>
+
+        <label id="cardSelected0id"></label>
+        <label id="cardSelected1id"></label>
+        <label id="cardSelected2id"></label>
+        <label id="cardSelected3id"></label>
+        <label id="cardSelected4id"></label>
+        <label id="cardSelected5id"></label>
+        <label id="cardSelected6id"></label>
+        <label id="cardSelected7id"></label>
+        <label id="cardSelected8id"></label>
+        <label id="cardSelected9id"></label>
+
+        <label id="cardSelected0userId"></label>
+        <label id="cardSelected1userId"></label>
+        <label id="cardSelected2userId"></label>
+        <label id="cardSelected3userId"></label>
+        <label id="cardSelected4userId"></label>
+        <label id="cardSelected5userId"></label>
+        <label id="cardSelected6userId"></label>
+        <label id="cardSelected7userId"></label>
+        <label id="cardSelected8userId"></label>
+        <label id="cardSelected9userId"></label>
+    </div>
+
+    <script src="js/utils.js"></script>
+    <script src="js/socket_js.js"></script>
+    <script src="js/game/play/game_play.js"></script>
+    <script src="js/game/menu/game_menu.js"></script>
+    <script src="js/login/login.js"></script>
+    <script src="js/redirect.js"></script>
+</body>
+</html>

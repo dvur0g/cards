@@ -9,20 +9,38 @@ databaseChangeLog:
             relativeToChangelogFile: true
             splitStatements: true
   - changeSet:
-      id: 002-clear-database
+      id: 002-init-cards-and-questions
       author: dvur0g
       changes:
         - sqlFile:
             encoding: UTF-8
-            path: sql/002-clear-database.sql
+            path: sql/002-init-cards-and-questions.sql
             relativeToChangelogFile: true
             splitStatements: true
   - changeSet:
-      id: 003-init-cards-and-questions
+      id: 003-suggested-questions-answers
       author: dvur0g
       changes:
         - sqlFile:
             encoding: UTF-8
-            path: sql/003-init-cards-and-questions.sql
+            path: sql/003-suggested-questions-answers.sql
+            relativeToChangelogFile: true
+            splitStatements: true
+  - changeSet:
+      id: 004-game-name-and-round
+      author: dvur0g
+      changes:
+        - sqlFile:
+            encoding: UTF-8
+            path: sql/004-game-name-and-round.sql
+            relativeToChangelogFile: true
+            splitStatements: true
+  - changeSet:
+      id: 005-game-state-hint
+      author: dvur0g
+      changes:
+        - sqlFile:
+            encoding: UTF-8
+            path: sql/005-game-state-hint.sql
             relativeToChangelogFile: true
             splitStatements: true

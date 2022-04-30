@@ -5,7 +5,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import ru.ruiners.cards.common.BusinessException;
-import ru.ruiners.cards.controller.dto.*;
+import ru.ruiners.cards.controller.dto.game.GameDto;
+import ru.ruiners.cards.controller.dto.game.GamePlayDto;
+import ru.ruiners.cards.controller.dto.game.SelectCardDto;
+import ru.ruiners.cards.controller.dto.game.SelectVictoriousAnswerDto;
 import ru.ruiners.cards.core.mapper.GameMapper;
 import ru.ruiners.cards.core.model.Card;
 import ru.ruiners.cards.core.model.Game;
@@ -29,10 +32,11 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class GameService {
 
-    private static final int MAX_PLAYERS_AMOUNT = 5;
+    private static final int MAX_PLAYERS_AMOUNT = 10;
     private static final int MAX_CARDS_AMOUNT = 10;
     private static final int PROCESSING_DELAY = 10;
     private static final int SELECTING_ANSWERS_DELAY = 20;
+    private static final int MIN_PLAYERS_AMOUNT = 2;
 
     private static final String TOPIC = "/topic/game-progress/";
     private static final Set<GameState> playingGameStates = Set.of(
@@ -52,13 +56,12 @@ public class GameService {
     private final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
     @Transactional
-    public GameDto createGame(String username, Integer minPlayersAmount) {
-        if (minPlayersAmount > MAX_PLAYERS_AMOUNT) {
-            throw new BusinessException("Invalid players amount");
-        }
+    public GameDto createGame(String username, String gameName) {
         Game game = new Game();
+        game.setName(gameName);
+        game.setRound(0);
         game.setState(GameState.CREATED);
-        game.setMinPlayersAmount(minPlayersAmount);
+        game.setMinPlayersAmount(MIN_PLAYERS_AMOUNT);
 
         Player player = preparePlayer(username);
         game.setPlayers(List.of(player));
@@ -117,12 +120,12 @@ public class GameService {
         simpMessagingTemplate.convertAndSend(TOPIC + result.getId(), result);
     }
 
-    public GameDto gamePlay(GamePlayDto gamePlay) {
+    public GameDto gamePlay(GamePlayDto gamePlay, String username) {
         Game game = repository.findById(gamePlay.getGameId()).orElseThrow(
                 () -> new BusinessException("Game not found")
         );
 
-        if (game.getPlayers().stream().noneMatch(player -> player.getUsername().equals(gamePlay.getUsername()))) {
+        if (game.getPlayers().stream().noneMatch(player -> player.getUsername().equals(username))) {
             throw new BusinessException("No such player in the game");
         }
 
@@ -137,7 +140,7 @@ public class GameService {
     }
 
     @Transactional
-    public void selectAnswer(SelectCardDto selectCard, AuthorizationDto authorizationDto) {
+    public void selectAnswer(SelectCardDto selectCard, String username) {
         Game game = getGameById(selectCard.getGameId());
 
         if (!game.getState().equals(GameState.SELECTING_ANSWERS)) {
@@ -145,7 +148,7 @@ public class GameService {
         }
 
         Player player = game.getPlayers().stream()
-                .filter(p -> p.getUsername().equals(authorizationDto.getUsername()))
+                .filter(p -> p.getUsername().equals(username))
                 .findAny().orElseThrow(() -> new BusinessException("No such player in the game"));
 
         if (player.equals(game.getCurrentPlayer())) {
@@ -164,13 +167,15 @@ public class GameService {
         player.setSelectedAnswer(card);
         playerRepository.save(player);
 
+        //TODO
+        // если все игроки выбрали ответы, переводить в статус SELECTING_VICTORIOUS_ANSWER
+        // но из-за этого падает
         GameDto result = mapper.toDto(repository.save(game));
         simpMessagingTemplate.convertAndSend(TOPIC + result.getId(), result);
     }
 
     @Transactional
-    public void selectVictoriousAnswer(SelectVictoriousAnswerDto selectVictoriousAnswer,
-                                       AuthorizationDto authorizationDto) {
+    public void selectVictoriousAnswer(SelectVictoriousAnswerDto selectVictoriousAnswer, String username) {
         Game game = getGameById(selectVictoriousAnswer.getGameId());
 
         if (!game.getState().equals(GameState.SELECTING_VICTORIOUS_ANSWER)) {
@@ -178,7 +183,7 @@ public class GameService {
         }
 
         Player currentPlayer = game.getCurrentPlayer();
-        if (currentPlayer == null || !currentPlayer.getUsername().equals(authorizationDto.getUsername())) {
+        if (currentPlayer == null || !currentPlayer.getUsername().equals(username)) {
             throw new BusinessException("Player null or not the host");
         }
 
@@ -193,6 +198,8 @@ public class GameService {
         game.setVictoriousPlayer(victoriousPlayer);
         repository.save(game);
 
+        //TODO
+        // тут падает иногда, надо починить
         setShowingVictoriousAnswerState(game.getId());
     }
 
@@ -204,10 +211,22 @@ public class GameService {
             return;
         }
 
+        if (isEverybodyLeft(gameId)) {
+            return;
+        }
+
         Game game = getGameById(gameId);
         game.setState(GameState.PROCESSING);
         game.setVictoriousAnswer(null);
+        game.setVictoriousPlayer(null);
         repository.save(game);
+
+        game.getPlayers().forEach(p -> {
+            if (p.getCards().size() < MAX_CARDS_AMOUNT) {
+                p.getCards().add(getRandomCard());
+                playerRepository.save(p);
+            }
+        });
 
         GameDto result = mapper.toDto(game, PROCESSING_DELAY);
         simpMessagingTemplate.convertAndSend(TOPIC + result.getId(), result);
@@ -220,6 +239,7 @@ public class GameService {
         log.info("set SELECTING_ANSWERS state for game {}", gameId);
         Game game = getGameById(gameId);
 
+        game.incrementRound();
         game.setCurrentQuestion(getRandomQuestion());
         game.setNextCurrentPlayer();
         game.setState(GameState.SELECTING_ANSWERS);
@@ -228,6 +248,9 @@ public class GameService {
         GameDto result = mapper.toDto(game, SELECTING_ANSWERS_DELAY);
         simpMessagingTemplate.convertAndSend(TOPIC + result.getId(), result);
 
+        //TODO
+        // если никто никто из игроков не выбрал ответ, то происходит непонятная задержка
+        // перед переходом в следующее состояние
         executor.schedule(() -> setSelectingVictoriousAnswerState(game.getId()), SELECTING_ANSWERS_DELAY, TimeUnit.SECONDS);
     }
 
@@ -240,19 +263,7 @@ public class GameService {
             return;
         }
 
-        //TODO ломает цикл
-//        if (game.getPlayers().stream().noneMatch(p -> p.getSelectedAnswer() != null)) {
-//            setShowingVictoriousAnswerState(gameId);
-//            return;
-//        }
-
         game.setState(GameState.SELECTING_VICTORIOUS_ANSWER);
-
-//        game.getPlayers().forEach(p -> {
-//            if (p.getCards().size() < MAX_CARDS_AMOUNT) {
-//                p.getCards().add(getRandomCard());
-//            }
-//        });
         repository.save(game);
 
         GameDto result = mapper.toDto(game, SELECTING_ANSWERS_DELAY);
@@ -262,11 +273,12 @@ public class GameService {
     }
 
     @Transactional
-    public void setShowingVictoriousAnswerState(Long gameId) {
+    synchronized public void setShowingVictoriousAnswerState(Long gameId) {
         log.info("set SHOWING_VICTORIOUS_ANSWER state for game {}", gameId);
         Game game = getGameById(gameId);
 
         if (!game.getState().equals(GameState.SELECTING_VICTORIOUS_ANSWER)) {
+            log.info("game {} has already passed SELECTING_VICTORIOUS_ANSWER state", gameId);
             return;
         }
 
@@ -274,7 +286,6 @@ public class GameService {
         if (victoriousPlayer != null) {
             game.setVictoriousAnswer(victoriousPlayer.getSelectedAnswer());
             victoriousPlayer.incrementScore();
-            game.setVictoriousPlayer(null);
         }
 
         game.setState(GameState.SHOW_VICTORIOUS_ANSWER);
@@ -297,18 +308,39 @@ public class GameService {
 
         log.info("set FINISHED state for game {}", game.getId());
 
-        game.setWinner(game.getWinnerOptional().get());
+        Optional<Player> winnerOptional = game.getWinnerOptional();
+        game.setWinner(winnerOptional.orElse(null));
         game.setState(GameState.FINISHED);
 
-        GameDto result = mapper.toDto(game);
+        GameDto result = mapper.toDto(repository.save(game));
+        simpMessagingTemplate.convertAndSend(TOPIC + result.getId(), result);
+        return true;
+    }
+
+    @Transactional
+    public boolean isEverybodyLeft(Long gameId) {
+        Game game = getGameById(gameId);
+
+        if (game.getPlayers().size() >= 2) {
+            return false;
+        }
+
+        log.info("set FINISHED state for game {}", game.getId());
+
+        game.setState(GameState.CANCELLED);
+
+        GameDto result = mapper.toDto(repository.save(game));
         simpMessagingTemplate.convertAndSend(TOPIC + result.getId(), result);
         return true;
     }
 
     @Transactional
     public Player preparePlayer(String username) {
-        Player player = playerRepository.findByUsername(username)
-                .orElseThrow(() -> new BusinessException("Player not found"));
+        Optional<Player> player = playerRepository.findByUsername(username);
+
+        if (player.isEmpty()) {
+            return playerRepository.save(new Player().setUsername(username).setScore(0));
+        }
 
         playerRepository.getGameIdByUsername(username)
                 .ifPresent(gameId -> repository.findById(gameId)
@@ -316,11 +348,12 @@ public class GameService {
                         .removeIf(p -> p.getUsername().equals(username))
                 );
 
-        playerRepository.removeCardsByUsername(player.getUsername());
-        player.setCards(null);
-        player.setSelectedAnswer(null);
-        player.setScore(0);
-        return playerRepository.save(player);
+        Player foundPlayer = player.get();
+        playerRepository.removeCardsByUsername(username);
+        foundPlayer.setCards(null);
+        foundPlayer.setSelectedAnswer(null);
+        foundPlayer.setScore(0);
+        return playerRepository.save(foundPlayer);
     }
 
     private Game getGameById(Long gameId) {

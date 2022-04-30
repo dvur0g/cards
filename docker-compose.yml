@@ -2,19 +2,23 @@ version: '2.3'
 services:
 
   cards:
-    image: cards:v1
+    image: cards:latest
+    container_name: cards
     restart: "no"
     depends_on:
-      - database
+      - postgres
+      - keycloak
     environment:
-      POSTGRES_HOST: database
+      POSTGRES_HOST: postgres
+      KEYCLOAK_HOST: keycloak
     expose:
-      - 8080
+      - 8181
     ports:
-      - "8080:8080"
+      - "8181:8181"
 
-  database:
+  postgres:
     image: postgres
+    container_name: postgres
     restart: always
     environment:
       POSTGRES_DB: cards
@@ -24,3 +28,25 @@ services:
       - 5432
     ports:
       - "5432:5432"
+    volumes:
+      - ./src/main/resources/db/schema/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  keycloak:
+    image: jboss/keycloak
+    container_name: keycloak
+    environment:
+      DB_VENDOR: POSTGRES
+      DB_ADDR: postgres
+      DB_DATABASE: cards
+      DB_SCHEMA: keycloak
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+#      KEYCLOAK_FRONTEND_URL: http://keycloak:8080/auth
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: admin_password
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    links:
+      - "postgres:postgres"

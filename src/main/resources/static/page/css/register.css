@@ -1,0 +1,92 @@
+@font-face {
+    font-family: TTCommonsBold;
+    src: url(../fonts/TTCommons-Bold.ttf);
+}
+@font-face {
+    font-family: TTCommonsExtraBold;
+    src: url(../fonts/TTCommons-ExtraBold.ttf);
+}
+@font-face {
+    font-family: TTCommonsMedium;
+    src: url(../fonts/TTCommons-Medium.ttf);
+}
+body{
+    background: #48ffcf;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.box{
+    padding-top: 3%;
+    width: 350px;
+    height: 630px;
+    transform: scale(0.9);
+}
+.title{
+    width: 200px;
+    font-family: TTCommonsBold;
+    font-size: 58px;
+    margin: 25px auto;
+}
+.box_login{
+    width: 350px;
+    height: 480px;
+    background-color: black;
+    padding-top: 5px;
+}
+.text_title{
+    color:white;
+    font-size: 28px;
+    font-family: TTCommonsExtraBold;
+    margin:20px;
+    width: 50px;
+    height: 30px;
+    margin-left: 25px;
+    letter-spacing: 1px;
+}
+
+.inputs_form,
+.inputs_button{
+    height: 35px;
+    width: 280px;
+    padding-left: 10px;
+    font-size: 20px;
+    color: rgb(0, 0, 0);
+    font-family: TTCommonsMedium;
+    margin-bottom: 10px;
+    margin-left: 25px;
+}
+
+::placeholder {
+    font-size: 20px;
+    color: rgb(161, 161, 161);
+    font-family: TTCommonsMedium;
+    margin-bottom: 10px;
+    margin-left: 25px;
+}
+
+.inputs_button{
+    color: black;
+    background-color: #48ffcf;
+    text-align: center;
+    height: 40px;
+    width: 295px;
+    border: none;
+    padding-top: 4px;
+    font-size: 22px;
+    letter-spacing: 2px;
+    font-family: TTCommonsExtraBold;
+    cursor: pointer;
+}
+.link a{
+    color: rgb(144, 144, 144);
+    font-size: 18px;
+    margin: 5px auto;
+    width: 151px;
+    height: 20px;
+    display: flex;
+    letter-spacing: 1px;
+    font-family: TTCommonsMedium;
+    text-decoration: none;
+    border-bottom: 2px solid rgb(144, 144, 144);
+}

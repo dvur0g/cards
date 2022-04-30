@@ -1,5 +1,11 @@
 server:
-  port: 8080
+  port: 8181
+  ssl:
+    enabled: false
+    key-store-type: PKCS12
+    key-store: classpath:keystore/cards.p12
+    key-store-password: password
+    key-alias: cards
 
 spring:
   application:
@@ -8,12 +14,18 @@ spring:
     hikari:
       connection-timeout: 20000
       maximum-pool-size: 5
-    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:postgres}?currentSchema=${POSTGRES_SCHEMA:cards}
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:5432/cards?currentSchema=cards
     username: postgres
     password: postgres
   liquibase:
     change-log: classpath:db/changelog.yml
-    default-schema: ${POSTGRES_SCHEMA:cards}
-#  jpa:
-#    hibernate:
-#      ddl-auto: create
+
+keycloak:
+  auth-server-url: http://${KEYCLOAK_HOST:localhost}:8080/auth
+  realm: cards_realm
+  resource: client
+  credentials:
+    secret: k1S0Iy2Zsrxg2ZbubwQnIxDyL7WcTgxO
+  public-client: true
+  bearer-only: true
+

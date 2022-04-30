@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>login</title>
+        <link rel="stylesheet" href="css/login.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    </head>
+    <body>
+        <div class="box">
+            <h1 class="title">cards.io</h1>
+            <div class="box_login">
+                <div class="text_title">Вход</div>
+
+                <label for="login"></label><input type="text" id="login" class="inputs_form" placeholder="Логин"><br>
+                <label for="password"></label><input type="password" id="password" class="inputs_form" placeholder="Пароль"><br>
+                <button id="loginButton" class="inputs_button" onclick="doLogin()">ВОЙТИ</button>
+
+                <div class="link"><a href="register.html">Впервые здесь?</a></div>
+            </div>
+        </div>
+
+        <script src="js/utils.js"></script>
+        <script src="js/socket_js.js"></script>
+        <script src="js/login/login.js"></script>
+        <script src="js/login/login_on_enter.js"></script>
+    </body>
+</html>
